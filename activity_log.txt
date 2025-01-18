@@ -4,3 +4,4 @@
 2025-01-13 - Improve documentation (auto)
 2025-01-15 - Fix one UI issue (auto)
 2025-01-17 - Improve local progress handling (auto)
+2025-01-18 - Add an accessibility or usability improvement (auto)
