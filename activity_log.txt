@@ -16,3 +16,4 @@
 2025-01-30 - Improve animation or interaction (auto)
 2025-01-31 - Improve local progress handling (auto)
 2025-02-01 - Add an accessibility or usability improvement (auto)
+2025-02-03 - Improve documentation (auto)
