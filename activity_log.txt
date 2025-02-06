@@ -18,3 +18,4 @@
 2025-02-01 - Add an accessibility or usability improvement (auto)
 2025-02-03 - Improve documentation (auto)
 2025-02-04 - Improve one learning activity (auto)
+2025-02-06 - Improve animation or interaction (auto)
