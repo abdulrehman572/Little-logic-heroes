@@ -35,3 +35,4 @@
 2025-02-28 - Improve local progress handling (auto)
 2025-03-01 - Add an accessibility or usability improvement (auto)
 2025-03-04 - Improve one learning activity (auto)
+2025-03-05 - Fix one UI issue (auto)
