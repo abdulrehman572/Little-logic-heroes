@@ -57,3 +57,4 @@
 2025-04-05 - Add an accessibility or usability improvement (auto)
 2025-04-08 - Improve one learning activity (auto)
 2025-04-09 - Fix one UI issue (auto)
+2025-04-11 - Improve local progress handling (auto)
