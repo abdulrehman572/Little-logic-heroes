@@ -67,3 +67,4 @@
 2025-04-21 - Improve documentation (auto)
 2025-04-22 - Improve one learning activity (auto)
 2025-04-23 - Fix one UI issue (auto)
+2025-04-24 - Improve animation or interaction (auto)
