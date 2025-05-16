@@ -80,3 +80,4 @@
 2025-05-12 - Improve documentation (auto)
 2025-05-14 - Fix one UI issue (auto)
 2025-05-15 - Improve animation or interaction (auto)
+2025-05-16 - Improve local progress handling (auto)
