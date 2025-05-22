@@ -85,3 +85,4 @@
 2025-05-19 - Improve documentation (auto)
 2025-05-20 - Improve one learning activity (auto)
 2025-05-21 - Fix one UI issue (auto)
+2025-05-22 - Improve animation or interaction (auto)
