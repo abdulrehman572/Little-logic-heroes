@@ -97,3 +97,4 @@
 2025-06-07 - Add an accessibility or usability improvement (auto)
 2025-06-09 - Improve documentation (auto)
 2025-06-10 - Improve one learning activity (auto)
+2025-06-11 - Fix one UI issue (auto)
