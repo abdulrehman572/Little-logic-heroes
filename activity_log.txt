@@ -100,3 +100,4 @@
 2025-06-11 - Fix one UI issue (auto)
 2025-06-13 - Improve local progress handling (auto)
 2025-06-14 - Add an accessibility or usability improvement (auto)
+2025-06-16 - Improve documentation (auto)
