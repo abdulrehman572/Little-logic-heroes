@@ -107,3 +107,4 @@
 2025-06-20 - Improve local progress handling (auto)
 2025-06-21 - Add an accessibility or usability improvement (auto)
 2025-06-24 - Improve one learning activity (auto)
+2025-06-27 - Improve local progress handling (auto)
