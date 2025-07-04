@@ -112,3 +112,4 @@
 2025-06-30 - Improve documentation (auto)
 2025-07-01 - Improve one learning activity (auto)
 2025-07-02 - Fix one UI issue (auto)
+2025-07-04 - Improve local progress handling (auto)
