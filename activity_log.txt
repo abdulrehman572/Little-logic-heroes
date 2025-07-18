@@ -122,3 +122,4 @@
 2025-07-15 - Improve one learning activity (auto)
 2025-07-16 - Fix one UI issue (auto)
 2025-07-17 - Improve animation or interaction (auto)
+2025-07-18 - Improve local progress handling (auto)
