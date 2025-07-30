@@ -128,3 +128,4 @@
 2025-07-25 - Improve local progress handling (auto)
 2025-07-26 - Add an accessibility or usability improvement (auto)
 2025-07-29 - Improve one learning activity (auto)
+2025-07-30 - Fix one UI issue (auto)
