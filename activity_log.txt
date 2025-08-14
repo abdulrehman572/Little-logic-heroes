@@ -139,3 +139,4 @@
 2025-08-11 - Improve documentation (auto)
 2025-08-12 - Improve one learning activity (auto)
 2025-08-13 - Fix one UI issue (auto)
+2025-08-14 - Improve animation or interaction (auto)
