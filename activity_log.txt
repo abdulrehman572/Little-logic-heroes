@@ -157,3 +157,4 @@
 2025-09-08 - Improve documentation (auto)
 2025-09-09 - Improve one learning activity (auto)
 2025-09-10 - Fix one UI issue (auto)
+2025-09-11 - Improve animation or interaction (auto)
