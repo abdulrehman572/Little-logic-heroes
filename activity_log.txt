@@ -172,3 +172,4 @@
 2025-10-02 - Improve animation or interaction (auto)
 2025-10-03 - Improve local progress handling (auto)
 2025-10-04 - Add an accessibility or usability improvement (auto)
+2025-10-06 - Improve documentation (auto)
