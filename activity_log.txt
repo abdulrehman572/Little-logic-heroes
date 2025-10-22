@@ -183,3 +183,4 @@
 2025-10-17 - Improve local progress handling (auto)
 2025-10-20 - Improve documentation (auto)
 2025-10-21 - Improve one learning activity (auto)
+2025-10-22 - Fix one UI issue (auto)
