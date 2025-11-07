@@ -194,3 +194,4 @@
 2025-11-04 - Improve one learning activity (auto)
 2025-11-05 - Fix one UI issue (auto)
 2025-11-06 - Improve animation or interaction (auto)
+2025-11-07 - Improve local progress handling (auto)
