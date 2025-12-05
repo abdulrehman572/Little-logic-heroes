@@ -208,3 +208,4 @@
 2025-12-02 - Improve one learning activity (auto)
 2025-12-03 - Fix one UI issue (auto)
 2025-12-04 - Improve animation or interaction (auto)
+2025-12-05 - Improve local progress handling (auto)
