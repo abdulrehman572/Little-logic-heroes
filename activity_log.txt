@@ -222,3 +222,4 @@
 2025-12-24 - Fix one UI issue (auto)
 2025-12-25 - Improve animation or interaction (auto)
 2025-12-27 - Add an accessibility or usability improvement (auto)
+2025-12-29 - Improve documentation (auto)
