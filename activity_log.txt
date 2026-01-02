@@ -226,3 +226,4 @@
 2025-12-30 - Improve one learning activity (auto)
 2025-12-31 - Fix one UI issue (auto)
 2026-01-01 - Improve animation or interaction (auto)
+2026-01-02 - Improve local progress handling (auto)
