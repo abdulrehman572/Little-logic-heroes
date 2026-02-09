@@ -249,3 +249,4 @@
 2026-02-03 - Improve one learning activity (auto)
 2026-02-04 - Fix one UI issue (auto)
 2026-02-07 - Add an accessibility or usability improvement (auto)
+2026-02-09 - Improve documentation (auto)
