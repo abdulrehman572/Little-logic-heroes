@@ -5,13 +5,13 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   Animated,
   PanResponder,
   Modal,
   Platform,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import ErrorBoundary from '../components/ErrorBoundary';
 
 // ==================== Audio (optional) ====================
@@ -37,7 +37,7 @@ type ActivityId = typeof ACTIVITIES[keyof typeof ACTIVITIES];
 const generateItems = (level: number, type: string) => {
   const count = level === 1 ? 5 : level === 2 ? 8 : 12;
   return Array(count).fill(null).map(() => ({
-    id: Math.random(),
+    id: Math.random().toString(),
     type,
     counted: false,
   }));
@@ -45,7 +45,7 @@ const generateItems = (level: number, type: string) => {
 
 // ==================== Emoji Item Component ====================
 const ItemEmoji = ({ type, counted, size = 80 }: { type: string; counted?: boolean; size?: number }) => {
-  let emoji = '🌰'; // acorn default
+  let emoji = '🌰';
   let bgColor = '#8B4513';
   if (type === 'mushroom') {
     emoji = '🍄';
@@ -89,9 +89,7 @@ const AudioManager = {
       try {
         const { sound } = await Audio.Sound.createAsync(source);
         this.sounds[key] = sound;
-      } catch (e) {
-        console.log(`Failed to load sound ${key}`);
-      }
+      } catch (e) {}
     }
   },
 
@@ -117,9 +115,7 @@ const useAdaptiveDifficulty = (moduleKey: string) => {
     loadLevel();
   }, []);
 
-  const adjustDifficulty = (isCorrect: boolean, responseTime: number) => {
-    // Simplified – just track for now
-  };
+  const adjustDifficulty = (isCorrect: boolean, responseTime: number) => {};
 
   return { level, adjustDifficulty };
 };
@@ -144,7 +140,7 @@ const AcornHunt = ({ level, onItemTap, onComplete }: any) => {
       setItems(newItems);
       setCounted(prev => prev + 1);
       AudioManager.playSound('count');
-      onItemTap(); // haptic or extra feedback if needed
+      onItemTap();
     }
   };
 
@@ -159,11 +155,14 @@ const AcornHunt = ({ level, onItemTap, onComplete }: any) => {
     }
   };
 
+  // Generate three unique options
   const options = [
     items.length,
     Math.min(20, items.length + 1),
     Math.max(1, items.length - 1),
-  ].sort(() => 0.5 - Math.random());
+  ];
+  // Remove duplicates (in case items.length = 1 => gives [1,2,1])
+  const uniqueOptions = [...new Set(options)].sort(() => 0.5 - Math.random());
 
   return (
     <View style={styles.activityContainer}>
@@ -171,7 +170,7 @@ const AcornHunt = ({ level, onItemTap, onComplete }: any) => {
       <View style={styles.itemsGrid}>
         {items.map((item, index) => (
           <TouchableOpacity
-            key={index}
+            key={item.id}
             style={[styles.item, item.counted && styles.itemCounted]}
             onPress={() => handleItemPress(index)}
           >
@@ -180,7 +179,7 @@ const AcornHunt = ({ level, onItemTap, onComplete }: any) => {
         ))}
       </View>
       <View style={styles.numerals}>
-        {options.map(num => (
+        {uniqueOptions.map(num => (
           <TouchableOpacity
             key={num}
             style={[styles.numeralButton, selectedNumeral === num && styles.numeralButtonSelected]}
@@ -200,7 +199,9 @@ const MushroomMatch = ({ level, onItemTap, onComplete }: any) => {
   const [mushrooms, setMushrooms] = useState<any[]>([]);
   const [placed, setPlaced] = useState(0);
   const startTime = useRef(Date.now());
-  const basketPosition = useRef({ x: 0, y: 0, width: 0, height: 0 });
+  const basketRef = useRef<View>(null);
+  const [basketLayout, setBasketLayout] = useState({ x: 0, y: 0, width: 0, height: 0 });
+  const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     const total = targetNumber + 2;
@@ -211,39 +212,47 @@ const MushroomMatch = ({ level, onItemTap, onComplete }: any) => {
         placed: false,
       }))
     );
+    setPlaced(0);
     startTime.current = Date.now();
-  }, [level]);
 
-  const isInDropZone = (gesture: any) => {
-    const zone = basketPosition.current;
-    return (
-      gesture.moveX > zone.x &&
-      gesture.moveX < zone.x + zone.width &&
-      gesture.moveY > zone.y &&
-      gesture.moveY < zone.y + zone.height
-    );
-  };
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, { toValue: 1.05, duration: 800, useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 1, duration: 800, useNativeDriver: true }),
+      ])
+    ).start();
+  }, [level]);
 
   const createPanResponder = (mushroom: any) => {
     return PanResponder.create({
       onStartShouldSetPanResponder: () => true,
-      onPanResponderMove: Animated.event(
-        [null, { dx: mushroom.pan.x, dy: mushroom.pan.y }],
-        { useNativeDriver: false }
-      ),
-      onPanResponderRelease: (e, gesture) => {
-        if (isInDropZone(gesture) && placed < targetNumber && !mushroom.placed) {
+      onPanResponderMove: (_, gesture) => {
+        mushroom.pan.setValue({ x: gesture.dx, y: gesture.dy });
+      },
+      onPanResponderRelease: (_, gesture) => {
+        const mushroomX = gesture.moveX - 30;
+        const mushroomY = gesture.moveY - 30;
+
+        const isInside =
+          mushroomX >= basketLayout.x &&
+          mushroomX <= basketLayout.x + basketLayout.width &&
+          mushroomY >= basketLayout.y &&
+          mushroomY <= basketLayout.y + basketLayout.height;
+
+        if (isInside && placed < targetNumber && !mushroom.placed) {
+          const targetX = basketLayout.x + basketLayout.width / 2 - (gesture.x0 + 30);
+          const targetY = basketLayout.y + basketLayout.height / 2 - (gesture.y0 + 30);
+
           Animated.spring(mushroom.pan, {
-            toValue: {
-              x: basketPosition.current.x - (mushroom.pan.x._value + 30),
-              y: basketPosition.current.y - (mushroom.pan.y._value + 30),
-            },
-            useNativeDriver: true,
+            toValue: { x: targetX, y: targetY },
+            useNativeDriver: false,
           }).start();
+
           mushroom.placed = true;
           setPlaced(prev => prev + 1);
           AudioManager.playSound('count');
           onItemTap();
+
           if (placed + 1 === targetNumber) {
             onComplete(true, Date.now() - startTime.current);
           }
@@ -251,7 +260,7 @@ const MushroomMatch = ({ level, onItemTap, onComplete }: any) => {
           Animated.spring(mushroom.pan, {
             toValue: { x: 0, y: 0 },
             friction: 5,
-            useNativeDriver: true,
+            useNativeDriver: false,
           }).start();
         }
       },
@@ -261,26 +270,34 @@ const MushroomMatch = ({ level, onItemTap, onComplete }: any) => {
   return (
     <View style={styles.activityContainer}>
       <Text style={styles.instruction}>Put {targetNumber} mushrooms in the basket</Text>
-      <View
-        style={styles.basket}
-        onLayout={event => {
-          const layout = event.nativeEvent.layout;
-          basketPosition.current = {
-            x: layout.x,
-            y: layout.y,
-            width: layout.width,
-            height: layout.height,
-          };
+
+      <Animated.View
+        ref={basketRef}
+        style={[styles.basketContainer, { transform: [{ scale: pulseAnim }] }]}
+        onLayout={() => {
+          if (basketRef.current) {
+            basketRef.current.measure((x, y, width, height, pageX, pageY) => {
+              setBasketLayout({ x: pageX, y: pageY, width, height });
+            });
+          }
         }}
+        collapsable={false}
       >
+        <View style={styles.basketBody}>
+          <View style={styles.basketHandle} />
+          <View style={styles.basketWoven} />
+          <View style={styles.basketShadow} />
+        </View>
         <Text style={styles.basketCount}>{placed}/{targetNumber}</Text>
-      </View>
+      </Animated.View>
+
       <View style={styles.mushroomsContainer}>
         {mushrooms.map(m => !m.placed && (
           <Animated.View
             key={m.id}
-            style={[m.pan.getLayout(), styles.mushroom]}
+            style={[{ transform: [{ translateX: m.pan.x }, { translateY: m.pan.y }] }, styles.mushroom]}
             {...createPanResponder(m).panHandlers}
+            collapsable={false}
           >
             <ItemEmoji type="mushroom" size={60} />
           </Animated.View>
@@ -290,95 +307,67 @@ const MushroomMatch = ({ level, onItemTap, onComplete }: any) => {
   );
 };
 
-// ==================== Activity 3: Number Line ====================
+// ==================== Activity 3: Number Line (Tap-based) ====================
 const NumberLine = ({ level, onItemTap, onComplete }: any) => {
   const maxNumber = level === 1 ? 5 : level === 2 ? 10 : 20;
   const numbers = Array.from({ length: maxNumber }, (_, i) => i + 1);
   const [missingPositions, setMissingPositions] = useState<number[]>([]);
-  const [tiles, setTiles] = useState<any[]>([]);
+  const [availableTiles, setAvailableTiles] = useState<number[]>([]);
   const [placed, setPlaced] = useState<Record<number, boolean>>({});
+  const [selectedTile, setSelectedTile] = useState<number | null>(null);
   const startTime = useRef(Date.now());
-  const dropZones = useRef<Record<string, any>>({});
 
   useEffect(() => {
     const shuffled = [...numbers].sort(() => 0.5 - Math.random());
     const missing = shuffled.slice(0, 3).sort((a, b) => a - b);
     setMissingPositions(missing);
-    setTiles(
-      missing.map(num => ({
-        id: num,
-        value: num,
-        pan: new Animated.ValueXY(),
-      }))
-    );
+    setAvailableTiles(missing);
+    setPlaced({});
+    setSelectedTile(null);
     startTime.current = Date.now();
   }, [level]);
 
-  const isInDropZone = (gesture: any, zone: any) => {
-    return (
-      gesture.moveX > zone.x &&
-      gesture.moveX < zone.x + zone.width &&
-      gesture.moveY > zone.y &&
-      gesture.moveY < zone.y + zone.height
-    );
+  const handleTilePress = (num: number) => {
+    setSelectedTile(num);
+    AudioManager.playSound('click');
   };
 
-  const createPanResponder = (tile: any) => {
-    return PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onPanResponderMove: Animated.event(
-        [null, { dx: tile.pan.x, dy: tile.pan.y }],
-        { useNativeDriver: false }
-      ),
-      onPanResponderRelease: (e, gesture) => {
-        const zone = dropZones.current[`zone_${tile.value}`];
-        if (zone && isInDropZone(gesture, zone)) {
-          Animated.spring(tile.pan, {
-            toValue: { x: zone.x - tile.initialX, y: zone.y - tile.initialY },
-            useNativeDriver: true,
-          }).start();
-          setPlaced(prev => ({ ...prev, [tile.value]: true }));
-          onItemTap();
-          if (Object.keys(placed).length + 1 === missingPositions.length) {
-            onComplete(true, Date.now() - startTime.current);
-          }
-        } else {
-          Animated.spring(tile.pan, {
-            toValue: { x: 0, y: 0 },
-            friction: 5,
-            useNativeDriver: true,
-          }).start();
-        }
-      },
-    });
+  const handleSlotPress = (slotNum: number) => {
+    if (selectedTile === null) return;
+
+    if (selectedTile === slotNum && !placed[slotNum]) {
+      setPlaced(prev => ({ ...prev, [slotNum]: true }));
+      setAvailableTiles(prev => prev.filter(n => n !== slotNum));
+      setSelectedTile(null);
+      AudioManager.playSound('count');
+      onItemTap();
+
+      if (Object.keys(placed).length + 1 === missingPositions.length) {
+        onComplete(true, Date.now() - startTime.current);
+      }
+    } else {
+      AudioManager.playSound('gentleError');
+      setSelectedTile(null);
+    }
   };
 
   return (
     <View style={styles.activityContainer}>
-      <Text style={styles.instruction}>Fill in the missing numbers</Text>
+      <Text style={styles.instruction}>Tap a number, then tap the ? to place it</Text>
+
       <View style={styles.numberLine}>
         {numbers.map(num => {
           const isMissing = missingPositions.includes(num);
           const isPlaced = placed[num];
+
           if (isMissing && !isPlaced) {
             return (
-              <View
-                key={`slot_${num}`}
-                style={styles.slot}
-                onLayout={event => {
-                  const layout = event.nativeEvent.layout;
-                  dropZones.current[`zone_${num}`] = {
-                    x: layout.x,
-                    y: layout.y,
-                    width: layout.width,
-                    height: layout.height,
-                  };
-                }}
-              >
+              <TouchableOpacity key={`slot_${num}`} style={styles.slot} onPress={() => handleSlotPress(num)}>
                 <Text style={styles.slotText}>?</Text>
-              </View>
+              </TouchableOpacity>
             );
           }
+
           return (
             <View key={num} style={styles.numberBox}>
               <Text style={styles.numberText}>{num}</Text>
@@ -386,59 +375,58 @@ const NumberLine = ({ level, onItemTap, onComplete }: any) => {
           );
         })}
       </View>
+
       <View style={styles.tilesContainer}>
-        {tiles.map(tile => {
-          if (placed[tile.value]) return null;
-          return (
-            <Animated.View
-              key={tile.id}
-              style={[tile.pan.getLayout(), styles.tile]}
-              {...createPanResponder(tile).panHandlers}
-              onLayout={event => {
-                const layout = event.nativeEvent.layout;
-                tile.initialX = layout.x;
-                tile.initialY = layout.y;
-              }}
-            >
-              <Text style={styles.tileText}>{tile.value}</Text>
-            </Animated.View>
-          );
-        })}
+        {availableTiles.map(num => (
+          <TouchableOpacity
+            key={num}
+            style={[styles.tile, selectedTile === num && styles.tileSelected]}
+            onPress={() => handleTilePress(num)}
+          >
+            <Text style={styles.tileText}>{num}</Text>
+          </TouchableOpacity>
+        ))}
       </View>
+
+      {selectedTile && (
+        <View style={styles.selectedHint}>
+          <Text style={styles.selectedHintText}>Selected: {selectedTile} – tap the correct ?</Text>
+        </View>
+      )}
     </View>
   );
 };
 
-// ==================== Activity 4: Rabbit's Garden ====================
+// ==================== Activity 4: Rabbit's Garden (Top/Bottom) ====================
 const RabbitGarden = ({ level, onItemTap, onComplete }: any) => {
-  const [leftCount, setLeftCount] = useState(0);
-  const [rightCount, setRightCount] = useState(0);
+  const [topCount, setTopCount] = useState(0);
+  const [bottomCount, setBottomCount] = useState(0);
   const [question, setQuestion] = useState<'more' | 'less'>('more');
   const startTime = useRef(Date.now());
 
   useEffect(() => {
     const max = level === 1 ? 5 : level === 2 ? 8 : 12;
-    const left = Math.floor(Math.random() * max) + 1;
-    const right = Math.floor(Math.random() * max) + 1;
-    setLeftCount(left);
-    setRightCount(right);
+    const top = Math.floor(Math.random() * max) + 1;
+    const bottom = Math.floor(Math.random() * max) + 1;
+    setTopCount(top);
+    setBottomCount(bottom);
     setQuestion(Math.random() > 0.5 ? 'more' : 'less');
     startTime.current = Date.now();
   }, [level]);
 
-  const handleChoice = (chooseLeft: boolean) => {
+  const handleChoice = (chooseTop: boolean) => {
     const correct = question === 'more'
-      ? (chooseLeft && leftCount > rightCount) || (!chooseLeft && rightCount > leftCount)
-      : (chooseLeft && leftCount < rightCount) || (!chooseLeft && rightCount < leftCount);
+      ? (chooseTop && topCount > bottomCount) || (!chooseTop && bottomCount > topCount)
+      : (chooseTop && topCount < bottomCount) || (!chooseTop && bottomCount < topCount);
     const responseTime = Date.now() - startTime.current;
     onItemTap();
     onComplete(correct, responseTime);
   };
 
-  const renderCarrots = (count: number) => {
+  const renderCarrots = (count: number, side: 'top' | 'bottom') => {
     const carrots = [];
     for (let i = 0; i < count; i++) {
-      carrots.push(<Text key={i} style={styles.carrot}>🥕</Text>);
+      carrots.push(<Text key={`${side}-${i}-${count}`} style={styles.carrot}>🥕</Text>);
     }
     return <View style={styles.carrotRow}>{carrots}</View>;
   };
@@ -448,12 +436,12 @@ const RabbitGarden = ({ level, onItemTap, onComplete }: any) => {
       <Text style={styles.instruction}>Which garden has {question} carrots?</Text>
       <View style={styles.gardens}>
         <TouchableOpacity style={styles.garden} onPress={() => handleChoice(true)}>
-          <Text style={styles.gardenLabel}>Left</Text>
-          {renderCarrots(leftCount)}
+          <Text style={styles.gardenLabel}>Top</Text>
+          {renderCarrots(topCount, 'top')}
         </TouchableOpacity>
         <TouchableOpacity style={styles.garden} onPress={() => handleChoice(false)}>
-          <Text style={styles.gardenLabel}>Right</Text>
-          {renderCarrots(rightCount)}
+          <Text style={styles.gardenLabel}>Bottom</Text>
+          {renderCarrots(bottomCount, 'bottom')}
         </TouchableOpacity>
       </View>
     </View>
@@ -477,7 +465,14 @@ const ForestStore = ({ level, onItemTap, onComplete }: any) => {
     const correct = a + b;
     const wrong1 = Math.max(1, correct - 1);
     const wrong2 = Math.min(max * 2, correct + 1);
-    setOptions([correct, wrong1, wrong2].sort(() => 0.5 - Math.random()));
+    // Ensure three unique options
+    const opts = [correct, wrong1, wrong2];
+    const uniqueOpts = [...new Set(opts)];
+    // If we lost one due to duplicate, add a fallback
+    while (uniqueOpts.length < 3) {
+      uniqueOpts.push(Math.floor(Math.random() * (max * 2)) + 1);
+    }
+    setOptions(uniqueOpts.sort(() => 0.5 - Math.random()));
     startTime.current = Date.now();
   }, [level]);
 
@@ -527,9 +522,7 @@ function CountingForestScreenContent({ navigation }: any) {
   const showTemporaryMessage = (text: string, type: 'success' | 'error') => {
     if (messageTimeout.current) clearTimeout(messageTimeout.current);
     setMessage({ text, type });
-    messageTimeout.current = setTimeout(() => {
-      setMessage(null);
-    }, 1500);
+    messageTimeout.current = setTimeout(() => setMessage(null), 1500);
   };
 
   const handleActivityComplete = (success: boolean, responseTime: number) => {
@@ -538,20 +531,15 @@ function CountingForestScreenContent({ navigation }: any) {
       AudioManager.playSound('success');
       setScore(prev => prev + 1);
       showTemporaryMessage('Great job!', 'success');
-      setCompletedActivities(prev => ({
-        ...prev,
-        [currentActivity]: true,
-      }));
+      setCompletedActivities(prev => ({ ...prev, [currentActivity]: true }));
       if (currentActivity < ACTIVITIES.FOREST_STORE) {
         setTimeout(() => setCurrentActivity((currentActivity + 1) as ActivityId), 1500);
       } else {
-        // All activities completed – show completion screen after a short delay
         setTimeout(() => setCompletionVisible(true), 1500);
       }
     } else {
       AudioManager.playSound('gentleError');
       showTemporaryMessage('Try again!', 'error');
-      // Do not advance, stay on same activity
     }
   };
 
@@ -562,28 +550,22 @@ function CountingForestScreenContent({ navigation }: any) {
     setCompletionVisible(false);
   };
 
-  const handleGoHome = () => {
-    navigation.goBack();
-  };
+  const handleGoHome = () => navigation.goBack();
 
   const renderActivity = () => {
-    const commonProps = {
-      level,
-      onItemTap: () => {}, // could be used for subtle feedback
-      onComplete: handleActivityComplete,
-    };
+    const commonProps = { level, onItemTap: () => {}, onComplete: handleActivityComplete };
     try {
       switch (currentActivity) {
         case ACTIVITIES.ACORN_HUNT:
-          return <AcornHunt {...commonProps} />;
+          return <AcornHunt key={currentActivity} {...commonProps} />;
         case ACTIVITIES.MUSHROOM_MATCH:
-          return <MushroomMatch {...commonProps} />;
+          return <MushroomMatch key={currentActivity} {...commonProps} />;
         case ACTIVITIES.NUMBER_LINE:
-          return <NumberLine {...commonProps} />;
+          return <NumberLine key={currentActivity} {...commonProps} />;
         case ACTIVITIES.RABBIT_GARDEN:
-          return <RabbitGarden {...commonProps} />;
+          return <RabbitGarden key={currentActivity} {...commonProps} />;
         case ACTIVITIES.FOREST_STORE:
-          return <ForestStore {...commonProps} />;
+          return <ForestStore key={currentActivity} {...commonProps} />;
         default:
           return null;
       }
@@ -619,18 +601,19 @@ function CountingForestScreenContent({ navigation }: any) {
           />
         ))}
       </View>
-      <View style={styles.mainContent}>
-        {renderActivity()}
-      </View>
+      <View style={styles.mainContent}>{renderActivity()}</View>
 
-      {/* Floating message */}
       {message && (
-        <View style={[styles.floatingMessage, message.type === 'success' ? styles.successMessage : styles.errorMessage]}>
+        <View
+          style={[
+            styles.floatingMessage,
+            message.type === 'success' ? styles.successMessage : styles.errorMessage,
+          ]}
+        >
           <Text style={styles.floatingText}>{message.text}</Text>
         </View>
       )}
 
-      {/* Completion Modal */}
       <Modal visible={completionVisible} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -655,7 +638,6 @@ function CountingForestScreenContent({ navigation }: any) {
   );
 }
 
-// ==================== Export with Error Boundary ====================
 export default function CountingForestScreen(props: any) {
   return (
     <ErrorBoundary>
@@ -664,12 +646,8 @@ export default function CountingForestScreen(props: any) {
   );
 }
 
-// ==================== Global Styles ====================
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#E8F5E9',
-  },
+  safeArea: { flex: 1, backgroundColor: '#E8F5E9' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -678,18 +656,9 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     backgroundColor: '#2E7D32',
   },
-  backButton: {
-    padding: 10,
-  },
-  backText: {
-    fontSize: 32,
-    color: 'white',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
-  },
+  backButton: { padding: 10 },
+  backText: { fontSize: 32, color: 'white' },
+  title: { fontSize: 24, fontWeight: 'bold', color: 'white' },
   scoreBadge: {
     backgroundColor: '#FFB74D',
     width: 50,
@@ -698,11 +667,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  scoreText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 20,
-  },
+  scoreText: { color: 'white', fontWeight: 'bold', fontSize: 20 },
   progressContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -722,40 +687,14 @@ const styles = StyleSheet.create({
     height: 16,
     borderRadius: 8,
   },
-  progressDotCompleted: {
-    backgroundColor: '#4CAF50',
-  },
-  mainContent: {
-    flex: 1,
-    padding: 20,
-  },
-  activityContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  instruction: {
-    fontSize: 24,
-    color: '#333',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  itemsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    marginBottom: 30,
-  },
-  item: {
-    margin: 10,
-  },
-  itemCounted: {
-    opacity: 0.4,
-  },
-  numerals: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
+  progressDotCompleted: { backgroundColor: '#4CAF50' },
+  mainContent: { flex: 1, padding: 20 },
+  activityContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  instruction: { fontSize: 24, color: '#333', marginBottom: 20, textAlign: 'center' },
+  itemsGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginBottom: 30 },
+  item: { margin: 10 },
+  itemCounted: { opacity: 0.4 },
+  numerals: { flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap' },
   numeralButton: {
     backgroundColor: '#FFB74D',
     padding: 20,
@@ -764,126 +703,97 @@ const styles = StyleSheet.create({
     minWidth: 80,
     alignItems: 'center',
   },
-  numeralButtonSelected: {
-    backgroundColor: '#2E7D32',
+  numeralButtonSelected: { backgroundColor: '#2E7D32' },
+  numeralText: { fontSize: 32, color: 'white', fontWeight: 'bold' },
+
+  basketContainer: { width: 220, height: 140, marginBottom: 40, justifyContent: 'center', alignItems: 'center' },
+  basketBody: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#A0522D',
+    borderRadius: 60,
+    borderWidth: 6,
+    borderColor: '#8B4513',
+    overflow: 'visible',
+    position: 'relative',
   },
-  numeralText: {
-    fontSize: 32,
-    color: 'white',
-    fontWeight: 'bold',
+  basketHandle: {
+    position: 'absolute',
+    top: -20,
+    left: 50,
+    width: 120,
+    height: 40,
+    borderWidth: 8,
+    borderColor: '#8B4513',
+    borderRadius: 40,
+    backgroundColor: 'transparent',
+    transform: [{ rotate: '5deg' }],
   },
-  basket: {
-    width: 200,
-    height: 120,
-    backgroundColor: '#8D6E63',
+  basketWoven: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    right: 10,
+    bottom: 10,
+    borderWidth: 2,
+    borderColor: '#CD853F',
+    borderRadius: 40,
+    backgroundColor: 'transparent',
+  },
+  basketShadow: {
+    position: 'absolute',
+    bottom: -5,
+    left: 20,
+    right: 20,
+    height: 20,
+    backgroundColor: 'rgba(0,0,0,0.2)',
     borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 40,
-    borderWidth: 3,
-    borderColor: '#2E7D32',
   },
   basketCount: {
+    position: 'absolute',
     fontSize: 28,
     color: 'white',
     fontWeight: 'bold',
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 4,
+    top: 40,
   },
-  mushroomsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-  },
-  mushroom: {
-    margin: 10,
-  },
-  numberLine: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    marginBottom: 40,
-  },
-  numberBox: {
-    width: 50,
-    height: 50,
-    backgroundColor: '#2E7D32',
-    borderRadius: 10,
-    margin: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  numberText: {
-    color: 'white',
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
+
+  mushroomsContainer: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' },
+  mushroom: { margin: 10 },
+
+  numberLine: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginBottom: 40 },
+  numberBox: { width: 60, height: 60, backgroundColor: '#2E7D32', borderRadius: 10, margin: 8, justifyContent: 'center', alignItems: 'center' },
+  numberText: { color: 'white', fontSize: 20, fontWeight: 'bold' },
   slot: {
-    width: 50,
-    height: 50,
-    backgroundColor: '#CCC',
+    width: 60,
+    height: 60,
+    backgroundColor: '#EEE',
     borderRadius: 10,
-    margin: 5,
+    margin: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
+    borderWidth: 3,
     borderColor: '#2E7D32',
     borderStyle: 'dashed',
   },
-  slotText: {
-    fontSize: 20,
-    color: '#2E7D32',
-  },
-  tilesContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  tile: {
-    width: 60,
-    height: 60,
-    backgroundColor: '#FFB74D',
-    borderRadius: 15,
-    margin: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 5,
-  },
-  tileText: {
-    fontSize: 24,
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  gardens: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginTop: 20,
-  },
-  garden: {
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#EFE6DD',
-    borderRadius: 15,
-    width: '40%',
-  },
-  gardenLabel: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  carrotRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-  },
-  carrot: {
-    fontSize: 30,
-    margin: 2,
-  },
-  problem: {
-    fontSize: 48,
-    fontWeight: 'bold',
-    marginBottom: 30,
-    color: '#2E7D32',
-  },
+  slotText: { fontSize: 20, color: '#2E7D32' },
+  tilesContainer: { flexDirection: 'row', justifyContent: 'center', marginTop: 30, paddingBottom: 20, flexWrap: 'wrap' },
+  tile: { width: 70, height: 70, backgroundColor: '#FFB74D', borderRadius: 15, margin: 10, justifyContent: 'center', alignItems: 'center', elevation: 5 },
+  tileSelected: { backgroundColor: '#FFB74D', borderWidth: 4, borderColor: '#2E7D32' },
+  tileText: { fontSize: 24, color: 'white', fontWeight: 'bold' },
+  selectedHint: { marginTop: 20, padding: 10, backgroundColor: '#FFF9C4', borderRadius: 10 },
+  selectedHintText: { fontSize: 18, color: '#2E7D32', fontWeight: 'bold' },
+
+  gardens: { flexDirection: 'row', justifyContent: 'space-around', width: '100%', marginTop: 20, flexWrap: 'wrap' },
+  garden: { alignItems: 'center', padding: 20, backgroundColor: '#EFE6DD', borderRadius: 15, width: '40%', minWidth: 150, margin: 10 },
+  gardenLabel: { fontSize: 18, fontWeight: 'bold', marginBottom: 10 },
+  carrotRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' },
+  carrot: { fontSize: 30, margin: 2 },
+
+  problem: { fontSize: 48, fontWeight: 'bold', marginBottom: 30, color: '#2E7D32' },
+
   floatingMessage: {
     position: 'absolute',
     bottom: 100,
@@ -898,85 +808,21 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-  successMessage: {
-    backgroundColor: '#4CAF50',
-  },
-  errorMessage: {
-    backgroundColor: '#F44336',
-  },
-  floatingText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    width: '80%',
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 30,
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#2E7D32',
-    marginBottom: 10,
-  },
-  modalSubtitle: {
-    fontSize: 18,
-    color: '#666',
-    marginBottom: 20,
-  },
-  modalScore: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  modalScoreLabel: {
-    fontSize: 16,
-    color: '#999',
-  },
-  modalScoreValue: {
-    fontSize: 48,
-    fontWeight: 'bold',
-    color: '#FFB74D',
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-  },
-  modalButton: {
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 30,
-    minWidth: 120,
-    alignItems: 'center',
-  },
-  homeButton: {
-    backgroundColor: '#8D6E63',
-  },
-  playAgainButton: {
-    backgroundColor: '#2E7D32',
-  },
-  modalButtonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  errorText: {
-    fontSize: 18,
-    color: 'red',
-    textAlign: 'center',
-  },
+  successMessage: { backgroundColor: '#4CAF50' },
+  errorMessage: { backgroundColor: '#F44336' },
+  floatingText: { color: 'white', fontSize: 18, fontWeight: 'bold' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
+  modalContent: { width: '80%', backgroundColor: 'white', borderRadius: 20, padding: 30, alignItems: 'center' },
+  modalTitle: { fontSize: 32, fontWeight: 'bold', color: '#2E7D32', marginBottom: 10 },
+  modalSubtitle: { fontSize: 18, color: '#666', marginBottom: 20 },
+  modalScore: { alignItems: 'center', marginBottom: 30 },
+  modalScoreLabel: { fontSize: 16, color: '#999' },
+  modalScoreValue: { fontSize: 48, fontWeight: 'bold', color: '#FFB74D' },
+  modalButtons: { flexDirection: 'row', justifyContent: 'space-around', width: '100%', flexWrap: 'wrap', gap: 10 },
+  modalButton: { paddingVertical: 15, paddingHorizontal: 20, borderRadius: 30, minWidth: 120, alignItems: 'center', marginVertical: 5 },
+  homeButton: { backgroundColor: '#8D6E63' },
+  playAgainButton: { backgroundColor: '#2E7D32' },
+  modalButtonText: { color: 'white', fontSize: 18, fontWeight: 'bold' },
+  errorContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  errorText: { fontSize: 18, color: 'red', textAlign: 'center' },
 });
