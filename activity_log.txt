@@ -262,3 +262,4 @@
 2026-02-24 - Improve one learning activity (auto)
 2026-02-25 - Fix one UI issue (auto)
 2026-02-26 - Improve animation or interaction (auto)
+2026-02-27 - Improve local progress handling (auto)
