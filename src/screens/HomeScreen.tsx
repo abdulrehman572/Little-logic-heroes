@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Image,
+  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { COLORS, SIZES } from "../constants/theme";
@@ -61,10 +62,47 @@ const modules = [
     description: "Complete mountain scene puzzles",
     screen: "PuzzlePeak",
   },
+  // NEW MODULES
+  {
+    id: 7,
+    title: "ABC Learning",
+    color: "#F9C74F",
+    icon: "🔤",
+    description: "Learn letters and phonics",
+    screen: "ABC",
+  },
+  {
+    id: 8,
+    title: "Counting",
+    color: "#90BE6D",
+    icon: "🔢",
+    description: "Practice numbers 1-10",
+    screen: "Counting",
+  },
 ];
 
 export default function HomeScreen() {
   const navigation = useNavigation();
+
+  // Handlers for hyperlink instructions
+  const handleGamePress = () => {
+    Alert.alert("Tip", "How to Play");
+  };
+  const handleSkillPress = () => {
+    Alert.alert(
+      "Skills",
+      "Each game teaches shape recognition, counting, patterns, logic, memory, and puzzles."
+    );
+  };
+  const handleBackInfo = () => {
+    Alert.alert(
+      "Navigation",
+      "Use the back button at the top left to return to this home screen."
+    );
+  };
+  const handleFunPress = () => {
+    Alert.alert("Enjoy!", "Have fun learning with NGES!");
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -75,12 +113,13 @@ export default function HomeScreen() {
         {/* Header with Logo */}
         <View style={styles.header}>
           <Image
-            source={require("../../assets/images/logo.png")} // Adjust path as needed
+            source={require("../../assets/images/logo.jpeg")}
             style={styles.logo}
             resizeMode="contain"
           />
-          <Text style={styles.title}>Little Logic Heroes</Text>
-          <Text style={styles.subtitle}>Educational games for kids 3-5</Text>
+          <Text style={styles.title}>NGES </Text>
+          <Text style={styles.title}>Smart Learning</Text>
+          <Text style={styles.subtitle}>Play Learn Earn and Lead the Future</Text>
         </View>
 
         {/* Modules Grid */}
@@ -100,18 +139,28 @@ export default function HomeScreen() {
           ))}
         </View>
 
-        {/* Instructions */}
+        {/* How to Play - Hyperlinks */}
         <View style={styles.instructions}>
           <Text style={styles.instructionsTitle}>How to Play:</Text>
-          <Text style={styles.instruction}>✨ Tap any game to start playing</Text>
-          <Text style={styles.instruction}>✨ Each game teaches different skills</Text>
-          <Text style={styles.instruction}>✨ Use the back button to return here</Text>
-          <Text style={styles.instruction}>✨ Have fun learning!</Text>
+          <Text style={styles.hyperlink} onPress={handleGamePress}>
+            ✨ Tap any game to start playing
+          </Text>
+          <Text style={styles.hyperlink} onPress={handleSkillPress}>
+            ✨ Each game teaches different skills
+          </Text>
+          <Text style={styles.hyperlink} onPress={handleBackInfo}>
+            ✨ Use the back button to return here
+          </Text>
+          <Text style={styles.hyperlink} onPress={handleFunPress}>
+            ✨ Have fun learning!
+          </Text>
         </View>
 
         {/* Developer Credit */}
         <View style={styles.footer}>
-          <Text style={styles.developerText}>Developed by Abdul Rehman Baghoor</Text>
+          <Text style={styles.developerText}>
+            Copyright © 2026 Next Gen Education System. 
+          </Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -135,7 +184,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     marginBottom: SIZES.sm,
-    borderRadius: 50, // optional: makes it a circle if logo is square
+    borderRadius: 50,
     borderWidth: 2,
     borderColor: COLORS.primary,
   },
@@ -200,9 +249,10 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     marginBottom: SIZES.sm,
   },
-  instruction: {
+  hyperlink: {
     fontSize: 14,
-    color: COLORS.textLight,
+    color: "#0645AD", // classic link blue
+    textDecorationLine: "underline",
     marginBottom: SIZES.xs,
     marginLeft: SIZES.xs,
   },

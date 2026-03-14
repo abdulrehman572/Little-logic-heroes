@@ -7,6 +7,8 @@ import PatternPathScreen from '../screens/PatternPathScreen';
 import LogicLandScreen from '../screens/LogicLandScreen';
 import MemoryMeadowScreen from '../screens/MemoryMeadowScreen';
 import PuzzlePeakScreen from '../screens/PuzzlePeakScreen';
+import AbcScreen from '../screens/AbcScreen';        // new
+import CountingScreen from '../screens/CountingScreen'; // new
 
 export type RootStackParamList = {
   Home: undefined;
@@ -16,6 +18,8 @@ export type RootStackParamList = {
   LogicLand: undefined;
   MemoryMeadow: undefined;
   PuzzlePeak: undefined;
+  Abc: undefined;       // new
+  Counting: undefined;  // new
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -57,6 +61,17 @@ export default function AppNavigator() {
         name="PuzzlePeak"
         component={PuzzlePeakScreen}
         options={{ title: 'Puzzle Peak' }}
+      />
+      {/* New screens */}
+      <Stack.Screen
+        name="Abc"
+        component={AbcScreen}
+        options={{ title: 'ABC Learning' }}
+      />
+      <Stack.Screen
+        name="Counting"
+        component={CountingScreen}
+        options={{ title: 'Counting' }}
       />
     </Stack.Navigator>
   );

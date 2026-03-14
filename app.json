@@ -1,24 +1,29 @@
 {
   "expo": {
     "name": "Little Logic Heroes",
-    "slug": "little-logic-heroes",
+    "slug": "littlelogicheros",
+    "owner": "abdeebalfsk",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#4A6FA5"
     },
+
     "assetBundlePatterns": [
       "**/*"
     ],
+
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.littlelogicheroes.app",
       "buildNumber": "1"
     },
+
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
@@ -27,14 +32,22 @@
       "package": "com.littlelogicheroes.app",
       "versionCode": 1
     },
+
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
     },
+
     "scheme": "littlelogicheroes",
-    "owner": "littlelogicheroes",
+
     "plugins": [
       "expo-font"
-    ]
+    ],
+
+    "extra": {
+      "eas": {
+        "projectId": "9314e43d-29c7-41e4-a7db-c360b2a5ea1b"
+      }
+    }
   }
 }

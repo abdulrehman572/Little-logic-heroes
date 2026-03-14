@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   View,
   Text,
@@ -40,172 +40,156 @@ const COLORS = {
   shadow: '#000000',
 };
 
-// ==================== SHAPE DATA (unused but kept for compatibility) ====================
-const SHAPES = [
-  { id: 1, name: "Circle", color: '#FFB347', emoji: "🔴", description: "round like a ball" },
-  { id: 2, name: "Square", color: '#6C9EBF', emoji: "🟦", description: "four equal sides" },
-  { id: 3, name: "Triangle", color: '#F4A261', emoji: "🔺", description: "three sides" },
-  { id: 4, name: "Star", color: '#E9B741', emoji: "⭐", description: "shining in the sky" },
-  { id: 5, name: "Heart", color: '#E57373', emoji: "❤️", description: "love shape" },
-  { id: 6, name: "Oval", color: '#81A4C6', emoji: "🥚", description: "egg-shaped" },
-  { id: 7, name: "Rectangle", color: '#B5A886', emoji: "🟦", description: "four sides, two long" },
-  { id: 8, name: "Pentagon", color: '#C4A77D', emoji: "⬟", description: "five sides" },
-  { id: 9, name: "Hexagon", color: '#A3C4A2', emoji: "⬡", description: "six sides" },
-  { id: 10, name: "Octagon", color: '#D4A5A5', emoji: "🛑", description: "eight sides" },
-  { id: 11, name: "Rhombus", color: '#B2A4D4', emoji: "💠", description: "diamond shape" },
-  { id: 12, name: "Trapezoid", color: '#A4C8D4', emoji: "📐", description: "four sides, two parallel" },
-];
-
-// ==================== LEVELS & QUESTIONS (120 brand new logic questions) ====================
+// ==================== LEVELS & QUESTIONS (120) ====================
 const LEVELS = [
   {
     name: "Level 1",
     questions: [
-      { id: 1, text: "What comes next? 2, 4, 6, ?", options: [{id:'A',label:'7'},{id:'B',label:'8'},{id:'C',label:'9'},{id:'D',label:'10'}], correct: 'B' },
-      { id: 2, text: "Which one is different? Apple, Banana, Carrot, Grape", options: [{id:'A',label:'Apple'},{id:'B',label:'Banana'},{id:'C',label:'Carrot'},{id:'D',label:'Grape'}], correct: 'C' },
-      { id: 3, text: "If you have 5 apples and you eat 2, how many left?", options: [{id:'A',label:'2'},{id:'B',label:'3'},{id:'C',label:'4'},{id:'D',label:'5'}], correct: 'B' },
-      { id: 4, text: "Which number is missing? 1, 3, 5, ?, 9", options: [{id:'A',label:'6'},{id:'B',label:'7'},{id:'C',label:'8'},{id:'D',label:'10'}], correct: 'B' },
-      { id: 5, text: "What is the opposite of hot?", options: [{id:'A',label:'warm'},{id:'B',label:'cold'},{id:'C',label:'cool'},{id:'D',label:'ice'}], correct: 'B' },
-      { id: 6, text: "Which shape has three sides?", options: [{id:'A',label:'square'},{id:'B',label:'circle'},{id:'C',label:'triangle'},{id:'D',label:'rectangle'}], correct: 'C' },
-      { id: 7, text: "How many legs does a dog have?", options: [{id:'A',label:'2'},{id:'B',label:'4'},{id:'C',label:'6'},{id:'D',label:'8'}], correct: 'B' },
-      { id: 8, text: "Which word is a color?", options: [{id:'A',label:'run'},{id:'B',label:'red'},{id:'C',label:'read'},{id:'D',label:'rod'}], correct: 'B' },
-      { id: 9, text: "What is 3 + 4?", options: [{id:'A',label:'6'},{id:'B',label:'7'},{id:'C',label:'8'},{id:'D',label:'9'}], correct: 'B' },
-      { id: 10, text: "Which one is a fruit?", options: [{id:'A',label:'carrot'},{id:'B',label:'banana'},{id:'C',label:'potato'},{id:'D',label:'onion'}], correct: 'B' },
-      { id: 11, text: "What comes after Monday?", options: [{id:'A',label:'Sunday'},{id:'B',label:'Tuesday'},{id:'C',label:'Wednesday'},{id:'D',label:'Friday'}], correct: 'B' },
-      { id: 12, text: "Which is the smallest?", options: [{id:'A',label:'1'},{id:'B',label:'5'},{id:'C',label:'10'},{id:'D',label:'20'}], correct: 'A' },
-      { id: 13, text: "Which one is round?", options: [{id:'A',label:'book'},{id:'B',label:'ball'},{id:'C',label:'box'},{id:'D',label:'brick'}], correct: 'B' },
-      { id: 14, text: "How many days in a week?", options: [{id:'A',label:'5'},{id:'B',label:'6'},{id:'C',label:'7'},{id:'D',label:'8'}], correct: 'C' },
-      { id: 15, text: "Which one can fly?", options: [{id:'A',label:'fish'},{id:'B',label:'bird'},{id:'C',label:'dog'},{id:'D',label:'cat'}], correct: 'B' },
-      { id: 16, text: "What is 10 - 3?", options: [{id:'A',label:'6'},{id:'B',label:'7'},{id:'C',label:'8'},{id:'D',label:'9'}], correct: 'B' },
-      { id: 17, text: "Which is a number?", options: [{id:'A',label:'tree'},{id:'B',label:'three'},{id:'C',label:'free'},{id:'D',label:'see'}], correct: 'B' },
-      { id: 18, text: "Which one is a toy?", options: [{id:'A',label:'doll'},{id:'B',label:'cup'},{id:'C',label:'plate'},{id:'D',label:'spoon'}], correct: 'A' },
-      { id: 19, text: "What is the first letter of 'cat'?", options: [{id:'A',label:'a'},{id:'B',label:'b'},{id:'C',label:'c'},{id:'D',label:'d'}], correct: 'C' },
-      { id: 20, text: "Which one is a month?", options: [{id:'A',label:'May'},{id:'B',label:'Car'},{id:'C',label:'Dog'},{id:'D',label:'Book'}], correct: 'A' },
+      { id: 1, text: "How many apples? 🍎", options: [{id:'1',label:'1'},{id:'2',label:'2'},{id:'3',label:'3'}], correct: '1' },
+      { id: 2, text: "How many cats? 🐱🐱", options: [{id:'1',label:'1'},{id:'2',label:'2'},{id:'3',label:'3'}], correct: '2' },
+      { id: 3, text: "Count the stars: ⭐⭐⭐", options: [{id:'2',label:'2'},{id:'3',label:'3'},{id:'4',label:'4'}], correct: '3' },
+      { id: 4, text: "How many balloons? 🎈🎈🎈🎈", options: [{id:'3',label:'3'},{id:'4',label:'4'},{id:'5',label:'5'}], correct: '4' },
+      { id: 5, text: "Count the flowers: 🌼🌼", options: [{id:'1',label:'1'},{id:'2',label:'2'},{id:'3',label:'3'}], correct: '2' },
+      { id: 6, text: "How many suns in the sky?", options: [{id:'0',label:'0'},{id:'1',label:'1'},{id:'2',label:'2'}], correct: '1' },
+      { id: 7, text: "Count the birds: 🐦🐦🐦", options: [{id:'2',label:'2'},{id:'3',label:'3'},{id:'4',label:'4'}], correct: '3' },
+      { id: 8, text: "How many legs on a dog?", options: [{id:'2',label:'2'},{id:'4',label:'4'},{id:'6',label:'6'}], correct: '4' },
+      { id: 9, text: "Count the wheels on a tricycle", options: [{id:'2',label:'2'},{id:'3',label:'3'},{id:'4',label:'4'}], correct: '3' },
+      { id: 10, text: "How many fingers on one hand?", options: [{id:'4',label:'4'},{id:'5',label:'5'},{id:'6',label:'6'}], correct: '5' },
+      { id: 11, text: "Count the moons: 🌝🌝", options: [{id:'1',label:'1'},{id:'2',label:'2'},{id:'3',label:'3'}], correct: '2' },
+      { id: 12, text: "How many noses on a rabbit?", options: [{id:'1',label:'1'},{id:'2',label:'2'},{id:'3',label:'3'}], correct: '1' },
+      { id: 13, text: "Count the leaves: 🍃🍃🍃🍃🍃", options: [{id:'4',label:'4'},{id:'5',label:'5'},{id:'6',label:'6'}], correct: '5' },
+      { id: 14, text: "How many ears on a cat?", options: [{id:'2',label:'2'},{id:'4',label:'4'},{id:'6',label:'6'}], correct: '2' },
+      { id: 15, text: "Count the fish: 🐟🐟🐟", options: [{id:'2',label:'2'},{id:'3',label:'3'},{id:'4',label:'4'}], correct: '3' },
+      { id: 16, text: "How many days in a week?", options: [{id:'5',label:'5'},{id:'6',label:'6'},{id:'7',label:'7'}], correct: '7' },
+      { id: 17, text: "Count the stars: ⭐⭐⭐⭐", options: [{id:'3',label:'3'},{id:'4',label:'4'},{id:'5',label:'5'}], correct: '4' },
+      { id: 18, text: "How many wings on a bird?", options: [{id:'2',label:'2'},{id:'4',label:'4'},{id:'6',label:'6'}], correct: '2' },
+      { id: 19, text: "Count the clouds: ☁️☁️☁️", options: [{id:'2',label:'2'},{id:'3',label:'3'},{id:'4',label:'4'}], correct: '3' },
+      { id: 20, text: "How many months in a year?", options: [{id:'10',label:'10'},{id:'12',label:'12'},{id:'14',label:'14'}], correct: '12' },
     ]
   },
   {
     name: "Level 2",
     questions: [
-      { id: 21, text: "What comes next? 5, 10, 15, ?", options: [{id:'A',label:'18'},{id:'B',label:'20'},{id:'C',label:'25'},{id:'D',label:'30'}], correct: 'B' },
-      { id: 22, text: "Which one is not a primary color?", options: [{id:'A',label:'red'},{id:'B',label:'blue'},{id:'C',label:'yellow'},{id:'D',label:'green'}], correct: 'D' },
-      { id: 23, text: "If you have 3 pairs of shoes, how many shoes?", options: [{id:'A',label:'3'},{id:'B',label:'4'},{id:'C',label:'5'},{id:'D',label:'6'}], correct: 'D' },
-      { id: 24, text: "Which word is a number?", options: [{id:'A',label:'ate'},{id:'B',label:'eight'},{id:'C',label:'height'},{id:'D',label:'weight'}], correct: 'B' },
-      { id: 25, text: "Complete the pattern: ★, ★★, ★★★, ?", options: [{id:'A',label:'★'},{id:'B',label:'★★'},{id:'C',label:'★★★★'},{id:'D',label:'★★★★★'}], correct: 'C' },
-      { id: 26, text: "Which animal says 'meow'?", options: [{id:'A',label:'dog'},{id:'B',label:'cat'},{id:'C',label:'cow'},{id:'D',label:'pig'}], correct: 'B' },
-      { id: 27, text: "How many sides does a square have?", options: [{id:'A',label:'3'},{id:'B',label:'4'},{id:'C',label:'5'},{id:'D',label:'6'}], correct: 'B' },
-      { id: 28, text: "Which one is a vehicle?", options: [{id:'A',label:'car'},{id:'B',label:'tree'},{id:'C',label:'house'},{id:'D',label:'ball'}], correct: 'A' },
-      { id: 29, text: "What is 12 divided by 3?", options: [{id:'A',label:'3'},{id:'B',label:'4'},{id:'C',label:'5'},{id:'D',label:'6'}], correct: 'B' },
-      { id: 30, text: "Which one is a season?", options: [{id:'A',label:'winter'},{id:'B',label:'water'},{id:'C',label:'wind'},{id:'D',label:'window'}], correct: 'A' },
-      { id: 31, text: "Which letter comes after P?", options: [{id:'A',label:'O'},{id:'B',label:'Q'},{id:'C',label:'R'},{id:'D',label:'S'}], correct: 'B' },
-      { id: 32, text: "Which one is a continent?", options: [{id:'A',label:'Asia'},{id:'B',label:'Atlantic'},{id:'C',label:'Arctic'},{id:'D',label:'Alps'}], correct: 'A' },
-      { id: 33, text: "How many minutes in an hour?", options: [{id:'A',label:'30'},{id:'B',label:'60'},{id:'C',label:'90'},{id:'D',label:'120'}], correct: 'B' },
-      { id: 34, text: "Which one is a tool?", options: [{id:'A',label:'hammer'},{id:'B',label:'milk'},{id:'C',label:'bread'},{id:'D',label:'chair'}], correct: 'A' },
-      { id: 35, text: "What is the opposite of big?", options: [{id:'A',label:'tall'},{id:'B',label:'large'},{id:'C',label:'small'},{id:'D',label:'huge'}], correct: 'C' },
-      { id: 36, text: "Which number is even?", options: [{id:'A',label:'3'},{id:'B',label:'5'},{id:'C',label:'7'},{id:'D',label:'8'}], correct: 'D' },
-      { id: 37, text: "Which word means the same as 'happy'?", options: [{id:'A',label:'sad'},{id:'B',label:'glad'},{id:'C',label:'mad'},{id:'D',label:'bad'}], correct: 'B' },
-      { id: 38, text: "Which one is a planet?", options: [{id:'A',label:'Mars'},{id:'B',label:'Moon'},{id:'C',label:'Sun'},{id:'D',label:'Star'}], correct: 'A' },
-      { id: 39, text: "What is 9 + 6?", options: [{id:'A',label:'14'},{id:'B',label:'15'},{id:'C',label:'16'},{id:'D',label:'17'}], correct: 'B' },
-      { id: 40, text: "Which one is a drink?", options: [{id:'A',label:'water'},{id:'B',label:'bread'},{id:'C',label:'rice'},{id:'D',label:'meat'}], correct: 'A' },
+      { id: 21, text: "5 + 2 = ?", options: [{id:'6',label:'6'},{id:'7',label:'7'},{id:'8',label:'8'}], correct: '7' },
+      { id: 22, text: "You have 3 cookies. You eat 1. How many left?", options: [{id:'1',label:'1'},{id:'2',label:'2'},{id:'3',label:'3'}], correct: '2' },
+      { id: 23, text: "Count the apples: 🍎🍎 + 🍎🍎🍎 = ?", options: [{id:'4',label:'4'},{id:'5',label:'5'},{id:'6',label:'6'}], correct: '5' },
+      { id: 24, text: "How many legs on 2 cats?", options: [{id:'6',label:'6'},{id:'8',label:'8'},{id:'10',label:'10'}], correct: '8' },
+      { id: 25, text: "7 - 3 = ?", options: [{id:'3',label:'3'},{id:'4',label:'4'},{id:'5',label:'5'}], correct: '4' },
+      { id: 26, text: "How many corners does a square have?", options: [{id:'3',label:'3'},{id:'4',label:'4'},{id:'5',label:'5'}], correct: '4' },
+      { id: 27, text: "Count by 2s: 2, 4, 6, _", options: [{id:'7',label:'7'},{id:'8',label:'8'},{id:'9',label:'9'}], correct: '8' },
+      { id: 28, text: "How many wheels on 3 cars?", options: [{id:'8',label:'8'},{id:'10',label:'10'},{id:'12',label:'12'}], correct: '12' },
+      { id: 29, text: "9 - 4 = ?", options: [{id:'4',label:'4'},{id:'5',label:'5'},{id:'6',label:'6'}], correct: '5' },
+      { id: 30, text: "There are 4 birds. 2 fly away. How many left?", options: [{id:'1',label:'1'},{id:'2',label:'2'},{id:'3',label:'3'}], correct: '2' },
+      { id: 31, text: "3 + 6 = ?", options: [{id:'8',label:'8'},{id:'9',label:'9'},{id:'10',label:'10'}], correct: '9' },
+      { id: 32, text: "How many legs on 2 spiders? (spider has 8 legs)", options: [{id:'12',label:'12'},{id:'14',label:'14'},{id:'16',label:'16'}], correct: '16' },
+      { id: 33, text: "10 - 5 = ?", options: [{id:'4',label:'4'},{id:'5',label:'5'},{id:'6',label:'6'}], correct: '5' },
+      { id: 34, text: "How many fingers on two hands?", options: [{id:'8',label:'8'},{id:'10',label:'10'},{id:'12',label:'12'}], correct: '10' },
+      { id: 35, text: "Count the stars: ⭐⭐⭐ + ⭐⭐ = ?", options: [{id:'4',label:'4'},{id:'5',label:'5'},{id:'6',label:'6'}], correct: '5' },
+      { id: 36, text: "4 + 5 = ?", options: [{id:'8',label:'8'},{id:'9',label:'9'},{id:'10',label:'10'}], correct: '9' },
+      { id: 37, text: "You have 8 candies. You eat 3. How many left?", options: [{id:'4',label:'4'},{id:'5',label:'5'},{id:'6',label:'6'}], correct: '5' },
+      { id: 38, text: "How many sides does a hexagon have?", options: [{id:'5',label:'5'},{id:'6',label:'6'},{id:'7',label:'7'}], correct: '6' },
+      { id: 39, text: "6 + 7 = ?", options: [{id:'12',label:'12'},{id:'13',label:'13'},{id:'14',label:'14'}], correct: '13' },
+      { id: 40, text: "How many eggs in a dozen?", options: [{id:'10',label:'10'},{id:'12',label:'12'},{id:'14',label:'14'}], correct: '12' },
     ]
   },
   {
     name: "Level 3",
     questions: [
-      { id: 41, text: "What is the next number? 2, 3, 5, 8, ?", options: [{id:'A',label:'11'},{id:'B',label:'12'},{id:'C',label:'13'},{id:'D',label:'14'}], correct: 'B' },
-      { id: 42, text: "Which word does not belong? run, walk, jump, eat", options: [{id:'A',label:'run'},{id:'B',label:'walk'},{id:'C',label:'jump'},{id:'D',label:'eat'}], correct: 'D' },
-      { id: 43, text: "If a shirt costs $20 and you have $15, how much more do you need?", options: [{id:'A',label:'5'},{id:'B',label:'10'},{id:'C',label:'15'},{id:'D',label:'20'}], correct: 'A' },
-      { id: 44, text: "Which number is odd?", options: [{id:'A',label:'12'},{id:'B',label:'14'},{id:'C',label:'16'},{id:'D',label:'17'}], correct: 'D' },
-      { id: 45, text: "Complete the analogy: Hand is to glove as foot is to ?", options: [{id:'A',label:'shoe'},{id:'B',label:'sock'},{id:'C',label:'pant'},{id:'D',label:'hat'}], correct: 'B' },
-      { id: 46, text: "What is the capital of France?", options: [{id:'A',label:'London'},{id:'B',label:'Paris'},{id:'C',label:'Rome'},{id:'D',label:'Berlin'}], correct: 'B' },
-      { id: 47, text: "How many hours in a day?", options: [{id:'A',label:'12'},{id:'B',label:'24'},{id:'C',label:'36'},{id:'D',label:'48'}], correct: 'B' },
-      { id: 48, text: "Which one is a musical instrument?", options: [{id:'A',label:'piano'},{id:'B',label:'table'},{id:'C',label:'chair'},{id:'D',label:'bed'}], correct: 'A' },
-      { id: 49, text: "What is 15 - 7?", options: [{id:'A',label:'7'},{id:'B',label:'8'},{id:'C',label:'9'},{id:'D',label:'10'}], correct: 'B' },
-      { id: 50, text: "Which word is a verb?", options: [{id:'A',label:'run'},{id:'B',label:'red'},{id:'C',label:'road'},{id:'D',label:'roof'}], correct: 'A' },
-      { id: 51, text: "Which shape has four equal sides?", options: [{id:'A',label:'rectangle'},{id:'B',label:'square'},{id:'C',label:'triangle'},{id:'D',label:'circle'}], correct: 'B' },
-      { id: 52, text: "Which one is a mammal?", options: [{id:'A',label:'dolphin'},{id:'B',label:'fish'},{id:'C',label:'shark'},{id:'D',label:'crab'}], correct: 'A' },
-      { id: 53, text: "What is 4 times 6?", options: [{id:'A',label:'20'},{id:'B',label:'24'},{id:'C',label:'28'},{id:'D',label:'30'}], correct: 'B' },
-      { id: 54, text: "Which one is a metal?", options: [{id:'A',label:'iron'},{id:'B',label:'wood'},{id:'C',label:'plastic'},{id:'D',label:'paper'}], correct: 'A' },
-      { id: 55, text: "Which word is a synonym for 'quick'?", options: [{id:'A',label:'slow'},{id:'B',label:'fast'},{id:'C',label:'last'},{id:'D',label:'past'}], correct: 'B' },
-      { id: 56, text: "How many centimeters in a meter?", options: [{id:'A',label:'10'},{id:'B',label:'100'},{id:'C',label:'1000'},{id:'D',label:'10000'}], correct: 'B' },
-      { id: 57, text: "Which one is a type of tree?", options: [{id:'A',label:'oak'},{id:'B',label:'oat'},{id:'C',label:'oar'},{id:'D',label:'oil'}], correct: 'A' },
-      { id: 58, text: "What is the next letter? A, C, E, G, ?", options: [{id:'A',label:'H'},{id:'B',label:'I'},{id:'C',label:'J'},{id:'D',label:'K'}], correct: 'B' },
-      { id: 59, text: "Which one is a unit of time?", options: [{id:'A',label:'second'},{id:'B',label:'meter'},{id:'C',label:'liter'},{id:'D',label:'gram'}], correct: 'A' },
-      { id: 60, text: "If you have a dozen eggs, how many?", options: [{id:'A',label:'10'},{id:'B',label:'12'},{id:'C',label:'14'},{id:'D',label:'16'}], correct: 'B' },
+      { id: 41, text: "15 + 7 = ?", options: [{id:'21',label:'21'},{id:'22',label:'22'},{id:'23',label:'23'}], correct: '22' },
+      { id: 42, text: "How many legs on 3 chickens and 2 cows?", options: [{id:'14',label:'14'},{id:'16',label:'16'},{id:'18',label:'18'}], correct: '16' },
+      { id: 43, text: "20 - 8 = ?", options: [{id:'10',label:'10'},{id:'11',label:'11'},{id:'12',label:'12'}], correct: '12' },
+      { id: 44, text: "Count by 5s: 5, 10, 15, _", options: [{id:'18',label:'18'},{id:'20',label:'20'},{id:'25',label:'25'}], correct: '20' },
+      { id: 45, text: "If you have 24 pencils and give half away, how many left?", options: [{id:'10',label:'10'},{id:'12',label:'12'},{id:'14',label:'14'}], correct: '12' },
+      { id: 46, text: "9 × 3 = ?", options: [{id:'24',label:'24'},{id:'27',label:'27'},{id:'30',label:'30'}], correct: '27' },
+      { id: 47, text: "How many minutes in an hour?", options: [{id:'50',label:'50'},{id:'60',label:'60'},{id:'70',label:'70'}], correct: '60' },
+      { id: 48, text: "18 - 9 = ?", options: [{id:'7',label:'7'},{id:'8',label:'8'},{id:'9',label:'9'}], correct: '9' },
+      { id: 49, text: "Count backwards from 20 to 15: 20, 19, 18, 17, ?", options: [{id:'15',label:'15'},{id:'16',label:'16'},{id:'14',label:'14'}], correct: '16' },
+      { id: 50, text: "How many corners on a cube?", options: [{id:'6',label:'6'},{id:'8',label:'8'},{id:'12',label:'12'}], correct: '8' },
+      { id: 51, text: "36 ÷ 6 = ?", options: [{id:'5',label:'5'},{id:'6',label:'6'},{id:'7',label:'7'}], correct: '6' },
+      { id: 52, text: "There are 30 students. 13 are boys. How many girls?", options: [{id:'15',label:'15'},{id:'17',label:'17'},{id:'19',label:'19'}], correct: '17' },
+      { id: 53, text: "14 + 19 = ?", options: [{id:'31',label:'31'},{id:'32',label:'32'},{id:'33',label:'33'}], correct: '33' },
+      { id: 54, text: "How many sides does an octagon have?", options: [{id:'6',label:'6'},{id:'7',label:'7'},{id:'8',label:'8'}], correct: '8' },
+      { id: 55, text: "25 - 12 = ?", options: [{id:'11',label:'11'},{id:'12',label:'12'},{id:'13',label:'13'}], correct: '13' },
+      { id: 56, text: "How many hours in a day?", options: [{id:'12',label:'12'},{id:'24',label:'24'},{id:'36',label:'36'}], correct: '24' },
+      { id: 57, text: "8 × 7 = ?", options: [{id:'54',label:'54'},{id:'56',label:'56'},{id:'58',label:'58'}], correct: '56' },
+      { id: 58, text: "You have 45 candies. You share equally among 5 friends. Each gets?", options: [{id:'7',label:'7'},{id:'8',label:'8'},{id:'9',label:'9'}], correct: '9' },
+      { id: 59, text: "Count by 3s: 3, 6, 9, 12, ?", options: [{id:'14',label:'14'},{id:'15',label:'15'},{id:'16',label:'16'}], correct: '15' },
+      { id: 60, text: "How many seconds in a minute?", options: [{id:'30',label:'30'},{id:'60',label:'60'},{id:'100',label:'100'}], correct: '60' },
     ]
   },
   {
-    name: "Level 4 ",
+    name: "Level 4",
     questions: [
-      { id: 61, text: "What comes next? 3, 6, 11, 18, ?", options: [{id:'A',label:'25'},{id:'B',label:'26'},{id:'C',label:'27'},{id:'D',label:'28'}], correct: 'C' },
-      { id: 62, text: "Which word is the odd one out? apple, banana, orange, carrot", options: [{id:'A',label:'apple'},{id:'B',label:'banana'},{id:'C',label:'orange'},{id:'D',label:'carrot'}], correct: 'D' },
-      { id: 63, text: "If today is Monday, what day is 3 days later?", options: [{id:'A',label:'Tuesday'},{id:'B',label:'Wednesday'},{id:'C',label:'Thursday'},{id:'D',label:'Friday'}], correct: 'C' },
-      { id: 64, text: "Which number is a prime?", options: [{id:'A',label:'9'},{id:'B',label:'15'},{id:'C',label:'17'},{id:'D',label:'21'}], correct: 'C' },
-      { id: 65, text: "Complete the analogy: Bird is to sky as fish is to ?", options: [{id:'A',label:'sea'},{id:'B',label:'land'},{id:'C',label:'air'},{id:'D',label:'tree'}], correct: 'A' },
-      { id: 66, text: "What is the square root of 81?", options: [{id:'A',label:'7'},{id:'B',label:'8'},{id:'C',label:'9'},{id:'D',label:'10'}], correct: 'C' },
-      { id: 67, text: "Which one is a continent?", options: [{id:'A',label:'Africa'},{id:'B',label:'Europe'},{id:'C',label:'Atlantic'},{id:'D',label:'Pacific'}], correct: 'A' },
-      { id: 68, text: "How many sides does a pentagon have?", options: [{id:'A',label:'4'},{id:'B',label:'5'},{id:'C',label:'6'},{id:'D',label:'7'}], correct: 'B' },
-      { id: 69, text: "Which word means the opposite of 'light'?", options: [{id:'A',label:'dark'},{id:'B',label:'heavy'},{id:'C',label:'bright'},{id:'D',label:'shine'}], correct: 'A' },
-      { id: 70, text: "What is 18 + 7?", options: [{id:'A',label:'24'},{id:'B',label:'25'},{id:'C',label:'26'},{id:'D',label:'27'}], correct: 'B' },
-      { id: 71, text: "Which one is a programming language?", options: [{id:'A',label:'Python'},{id:'B',label:'Cobra'},{id:'C',label:'Viper'},{id:'D',label:'Anaconda'}], correct: 'A' },
-      { id: 72, text: "How many degrees in a right angle?", options: [{id:'A',label:'45'},{id:'B',label:'90'},{id:'C',label:'180'},{id:'D',label:'360'}], correct: 'B' },
-      { id: 73, text: "Which one is a gas?", options: [{id:'A',label:'oxygen'},{id:'B',label:'water'},{id:'C',label:'sand'},{id:'D',label:'rock'}], correct: 'A' },
-      { id: 74, text: "What is the missing number? 2, 4, 8, 16, ?", options: [{id:'A',label:'24'},{id:'B',label:'32'},{id:'C',label:'64'},{id:'D',label:'128'}], correct: 'B' },
-      { id: 75, text: "Which word is a profession?", options: [{id:'A',label:'teacher'},{id:'B',label:'student'},{id:'C',label:'school'},{id:'D',label:'book'}], correct: 'A' },
-      { id: 76, text: "Which one is a country?", options: [{id:'A',label:'Canada'},{id:'B',label:'Chicago'},{id:'C',label:'California'},{id:'D',label:'Cairo'}], correct: 'A' },
-      { id: 77, text: "What is 20% of 50?", options: [{id:'A',label:'5'},{id:'B',label:'10'},{id:'C',label:'15'},{id:'D',label:'20'}], correct: 'B' },
-      { id: 78, text: "Which one is a type of bird?", options: [{id:'A',label:'eagle'},{id:'B',label:'lion'},{id:'C',label:'tiger'},{id:'D',label:'bear'}], correct: 'A' },
-      { id: 79, text: "Which letter is a vowel?", options: [{id:'A',label:'B'},{id:'B',label:'C'},{id:'C',label:'D'},{id:'D',label:'E'}], correct: 'D' },
-      { id: 80, text: "If you have 4 quarters, how many dollars?", options: [{id:'A',label:'0.5'},{id:'B',label:'1'},{id:'C',label:'2'},{id:'D',label:'4'}], correct: 'B' },
+      { id: 61, text: "125 - 87 = ?", options: [{id:'36',label:'36'},{id:'38',label:'38'},{id:'40',label:'40'}], correct: '38' },
+      { id: 62, text: "How many legs on 4 spiders and 2 birds?", options: [{id:'36',label:'36'},{id:'38',label:'38'},{id:'40',label:'40'}], correct: '36' },
+      { id: 63, text: "42 + 39 = ?", options: [{id:'79',label:'79'},{id:'81',label:'81'},{id:'83',label:'83'}], correct: '81' },
+      { id: 64, text: "What is 3/4 of 20?", options: [{id:'15',label:'15'},{id:'16',label:'16'},{id:'17',label:'17'}], correct: '15' },
+      { id: 65, text: "Count by 6s: 6, 12, 18, 24, ?", options: [{id:'28',label:'28'},{id:'30',label:'30'},{id:'32',label:'32'}], correct: '30' },
+      { id: 66, text: "A box contains 48 chocolates. You eat 12. How many left?", options: [{id:'34',label:'34'},{id:'36',label:'36'},{id:'38',label:'38'}], correct: '36' },
+      { id: 67, text: "15 × 6 = ?", options: [{id:'80',label:'80'},{id:'90',label:'90'},{id:'100',label:'100'}], correct: '90' },
+      { id: 68, text: "How many edges on a cube?", options: [{id:'8',label:'8'},{id:'10',label:'10'},{id:'12',label:'12'}], correct: '12' },
+      { id: 69, text: "144 ÷ 12 = ?", options: [{id:'10',label:'10'},{id:'11',label:'11'},{id:'12',label:'12'}], correct: '12' },
+      { id: 70, text: "If a train leaves at 3:15 and arrives at 5:45, how many minutes?", options: [{id:'120',label:'120'},{id:'150',label:'150'},{id:'180',label:'180'}], correct: '150' },
+      { id: 71, text: "50 - 27 = ?", options: [{id:'21',label:'21'},{id:'23',label:'23'},{id:'25',label:'25'}], correct: '23' },
+      { id: 72, text: "How many centimeters in a meter?", options: [{id:'10',label:'10'},{id:'100',label:'100'},{id:'1000',label:'1000'}], correct: '100' },
+      { id: 73, text: "23 + 48 = ?", options: [{id:'69',label:'69'},{id:'71',label:'71'},{id:'73',label:'73'}], correct: '71' },
+      { id: 74, text: "Count by 7s: 7, 14, 21, 28, ?", options: [{id:'34',label:'34'},{id:'35',label:'35'},{id:'36',label:'36'}], correct: '35' },
+      { id: 75, text: "How many faces on a square pyramid?", options: [{id:'4',label:'4'},{id:'5',label:'5'},{id:'6',label:'6'}], correct: '5' },
+      { id: 76, text: "64 ÷ 8 = ?", options: [{id:'6',label:'6'},{id:'7',label:'7'},{id:'8',label:'8'}], correct: '8' },
+      { id: 77, text: "You have 3 dozen eggs. You use 15. How many left?", options: [{id:'19',label:'19'},{id:'21',label:'21'},{id:'23',label:'23'}], correct: '21' },
+      { id: 78, text: "9 × 12 = ?", options: [{id:'102',label:'102'},{id:'108',label:'108'},{id:'114',label:'114'}], correct: '108' },
+      { id: 79, text: "How many minutes in a quarter hour?", options: [{id:'15',label:'15'},{id:'20',label:'20'},{id:'25',label:'25'}], correct: '15' },
+      { id: 80, text: "81 - 45 = ?", options: [{id:'34',label:'34'},{id:'36',label:'36'},{id:'38',label:'38'}], correct: '36' },
     ]
   },
   {
     name: "Level 5",
     questions: [
-      { id: 81, text: "What is the next number? 1, 4, 9, 16, ?", options: [{id:'A',label:'20'},{id:'B',label:'25'},{id:'C',label:'30'},{id:'D',label:'36'}], correct: 'B' },
-      { id: 82, text: "Which word does not belong? happy, joyful, sad, elated", options: [{id:'A',label:'happy'},{id:'B',label:'joyful'},{id:'C',label:'sad'},{id:'D',label:'elated'}], correct: 'C' },
-      { id: 83, text: "If a train leaves at 3:15 and arrives at 5:45, how long is the journey?", options: [{id:'A',label:'2h'},{id:'B',label:'2h15m'},{id:'C',label:'2h30m'},{id:'D',label:'3h'}], correct: 'C' },
-      { id: 84, text: "Which number is divisible by 3?", options: [{id:'A',label:'14'},{id:'B',label:'16'},{id:'C',label:'18'},{id:'D',label:'20'}], correct: 'C' },
-      { id: 85, text: "Complete the analogy: Book is to read as food is to ?", options: [{id:'A',label:'cook'},{id:'B',label:'eat'},{id:'C',label:'buy'},{id:'D',label:'sell'}], correct: 'B' },
-      { id: 86, text: "What is the value of π approximated?", options: [{id:'A',label:'2.14'},{id:'B',label:'3.14'},{id:'C',label:'4.14'},{id:'D',label:'5.14'}], correct: 'B' },
-      { id: 87, text: "Which one is a noble gas?", options: [{id:'A',label:'Helium'},{id:'B',label:'Gold'},{id:'C',label:'Silver'},{id:'D',label:'Iron'}], correct: 'A' },
-      { id: 88, text: "How many millimeters in a centimeter?", options: [{id:'A',label:'10'},{id:'B',label:'100'},{id:'C',label:'1000'},{id:'D',label:'0.1'}], correct: 'A' },
-      { id: 89, text: "Which word is a synonym for 'difficult'?", options: [{id:'A',label:'easy'},{id:'B',label:'soft'},{id:'C',label:'hard'},{id:'D',label:'light'}], correct: 'C' },
-      { id: 90, text: "What is 36 divided by 4?", options: [{id:'A',label:'8'},{id:'B',label:'9'},{id:'C',label:'10'},{id:'D',label:'11'}], correct: 'B' },
-      { id: 91, text: "Which one is a continent?", options: [{id:'A',label:'Australia'},{id:'B',label:'Greenland'},{id:'C',label:'Iceland'},{id:'D',label:'New Zealand'}], correct: 'A' },
-      { id: 92, text: "How many sides does a hexagon have?", options: [{id:'A',label:'5'},{id:'B',label:'6'},{id:'C',label:'7'},{id:'D',label:'8'}], correct: 'B' },
-      { id: 93, text: "Which word is a type of fruit?", options: [{id:'A',label:'strawberry'},{id:'B',label:'carrot'},{id:'C',label:'potato'},{id:'D',label:'onion'}], correct: 'A' },
-      { id: 94, text: "What is the cube of 3?", options: [{id:'A',label:'9'},{id:'B',label:'27'},{id:'C',label:'81'},{id:'D',label:'99'}], correct: 'B' },
-      { id: 95, text: "Which one is a planet?", options: [{id:'A',label:'Jupiter'},{id:'B',label:'Pluto'},{id:'C',label:'Moon'},{id:'D',label:'Sun'}], correct: 'A' },
-      { id: 96, text: "If you have 5 dimes, how many cents?", options: [{id:'A',label:'5'},{id:'B',label:'10'},{id:'C',label:'50'},{id:'D',label:'100'}], correct: 'C' },
-      { id: 97, text: "Which letter is the 10th letter of the alphabet?", options: [{id:'A',label:'H'},{id:'B',label:'I'},{id:'C',label:'J'},{id:'D',label:'K'}], correct: 'C' },
-      { id: 98, text: "What is the sum of angles in a triangle?", options: [{id:'A',label:'90'},{id:'B',label:'180'},{id:'C',label:'270'},{id:'D',label:'360'}], correct: 'B' },
-      { id: 99, text: "Which one is a mode of transportation?", options: [{id:'A',label:'bicycle'},{id:'B',label:'tree'},{id:'C',label:'cloud'},{id:'D',label:'river'}], correct: 'A' },
-      { id: 100, text: "What is 8 x 7?", options: [{id:'A',label:'54'},{id:'B',label:'56'},{id:'C',label:'58'},{id:'D',label:'60'}], correct: 'B' },
+      { id: 81, text: "56 × 7 = ?", options: [{id:'372',label:'372'},{id:'392',label:'392'},{id:'412',label:'412'}], correct: '392' },
+      { id: 82, text: "How many legs on 5 octopuses (8 legs) and 3 crabs (10 legs)?", options: [{id:'70',label:'70'},{id:'72',label:'72'},{id:'74',label:'74'}], correct: '70' },
+      { id: 83, text: "1440 ÷ 12 = ?", options: [{id:'110',label:'110'},{id:'120',label:'120'},{id:'130',label:'130'}], correct: '120' },
+      { id: 84, text: "What is 3/5 of 75?", options: [{id:'45',label:'45'},{id:'50',label:'50'},{id:'55',label:'55'}], correct: '45' },
+      { id: 85, text: "Count by 8s: 8, 16, 24, 32, 40, ?", options: [{id:'44',label:'44'},{id:'48',label:'48'},{id:'52',label:'52'}], correct: '48' },
+      { id: 86, text: "How many seconds in 2 hours?", options: [{id:'3600',label:'3600'},{id:'7200',label:'7200'},{id:'14400',label:'14400'}], correct: '7200' },
+      { id: 87, text: "108 - 59 = ?", options: [{id:'47',label:'47'},{id:'49',label:'49'},{id:'51',label:'51'}], correct: '49' },
+      { id: 88, text: "How many vertices on a triangular prism?", options: [{id:'4',label:'4'},{id:'6',label:'6'},{id:'8',label:'8'}], correct: '6' },
+      { id: 89, text: "25 × 18 = ?", options: [{id:'430',label:'430'},{id:'450',label:'450'},{id:'470',label:'470'}], correct: '450' },
+      { id: 90, text: "A tank holds 500 litres. If you pour 3/4 of it, how much left?", options: [{id:'100',label:'100'},{id:'125',label:'125'},{id:'150',label:'150'}], correct: '125' },
+      { id: 91, text: "144 + 256 = ?", options: [{id:'400',label:'400'},{id:'410',label:'410'},{id:'420',label:'420'}], correct: '400' },
+      { id: 92, text: "How many days in a leap year?", options: [{id:'365',label:'365'},{id:'366',label:'366'},{id:'367',label:'367'}], correct: '366' },
+      { id: 93, text: "78 ÷ 6 = ?", options: [{id:'11',label:'11'},{id:'12',label:'12'},{id:'13',label:'13'}], correct: '13' },
+      { id: 94, text: "What is 2/3 of 90?", options: [{id:'50',label:'50'},{id:'60',label:'60'},{id:'70',label:'70'}], correct: '60' },
+      { id: 95, text: "Count by 9s: 9, 18, 27, 36, 45, ?", options: [{id:'52',label:'52'},{id:'54',label:'54'},{id:'56',label:'56'}], correct: '54' },
+      { id: 96, text: "How many edges on a square pyramid?", options: [{id:'6',label:'6'},{id:'8',label:'8'},{id:'10',label:'10'}], correct: '8' },
+      { id: 97, text: "17 × 12 = ?", options: [{id:'194',label:'194'},{id:'204',label:'204'},{id:'214',label:'214'}], correct: '204' },
+      { id: 98, text: "You have 120 stamps. You give 25 to your friend and buy 30 more. How many now?", options: [{id:'115',label:'115'},{id:'125',label:'125'},{id:'135',label:'135'}], correct: '125' },
+      { id: 99, text: "What is the average of 14, 18, 22?", options: [{id:'16',label:'16'},{id:'18',label:'18'},{id:'20',label:'20'}], correct: '18' },
+      { id: 100, text: "How many millimeters in 3.5 cm?", options: [{id:'30',label:'30'},{id:'35',label:'35'},{id:'40',label:'40'}], correct: '35' },
     ]
   },
   {
     name: "Level 6",
     questions: [
-      { id: 101, text: "What comes next? 2, 3, 5, 9, 17, ?", options: [{id:'A',label:'31'},{id:'B',label:'33'},{id:'C',label:'35'},{id:'D',label:'37'}], correct: 'B' },
-      { id: 102, text: "Which word is the odd one out? circle, square, triangle, sphere", options: [{id:'A',label:'circle'},{id:'B',label:'square'},{id:'C',label:'triangle'},{id:'D',label:'sphere'}], correct: 'D' },
-      { id: 103, text: "If a clock shows 3:15, what is the angle between hour and minute hands?", options: [{id:'A',label:'0°'},{id:'B',label:'7.5°'},{id:'C',label:'15°'},{id:'D',label:'30°'}], correct: 'B' },
-      { id: 104, text: "Which number is a perfect cube?", options: [{id:'A',label:'16'},{id:'B',label:'25'},{id:'C',label:'27'},{id:'D',label:'36'}], correct: 'C' },
-      { id: 105, text: "Complete the analogy: Tree is to forest as star is to ?", options: [{id:'A',label:'sky'},{id:'B',label:'galaxy'},{id:'C',label:'universe'},{id:'D',label:'sun'}], correct: 'B' },
-      { id: 106, text: "What is the square root of 144?", options: [{id:'A',label:'10'},{id:'B',label:'12'},{id:'C',label:'14'},{id:'D',label:'16'}], correct: 'B' },
-      { id: 107, text: "Which one is a type of rock?", options: [{id:'A',label:'igneous'},{id:'B',label:'magma'},{id:'C',label:'lava'},{id:'D',label:'volcano'}], correct: 'A' },
-      { id: 108, text: "How many faces does a cube have?", options: [{id:'A',label:'4'},{id:'B',label:'6'},{id:'C',label:'8'},{id:'D',label:'12'}], correct: 'B' },
-      { id: 109, text: "Which word means the same as 'enormous'?", options: [{id:'A',label:'tiny'},{id:'B',label:'huge'},{id:'C',label:'medium'},{id:'D',label:'small'}], correct: 'B' },
-      { id: 110, text: "What is 15% of 200?", options: [{id:'A',label:'15'},{id:'B',label:'30'},{id:'C',label:'35'},{id:'D',label:'40'}], correct: 'B' },
-      { id: 111, text: "Which one is a programming paradigm?", options: [{id:'A',label:'object-oriented'},{id:'B',label:'linear'},{id:'C',label:'circular'},{id:'D',label:'triangular'}], correct: 'A' },
-      { id: 112, text: "How many continents are there?", options: [{id:'A',label:'5'},{id:'B',label:'6'},{id:'C',label:'7'},{id:'D',label:'8'}], correct: 'C' },
-      { id: 113, text: "Which one is a type of cloud?", options: [{id:'A',label:'cumulus'},{id:'B',label:'stratus'},{id:'C',label:'both'},{id:'D',label:'neither'}], correct: 'A' },
-      { id: 114, text: "What is the next number? 1, 1, 2, 3, 5, 8, ?", options: [{id:'A',label:'11'},{id:'B',label:'12'},{id:'C',label:'13'},{id:'D',label:'14'}], correct: 'C' },
-      { id: 115, text: "Which word is a palindrome?", options: [{id:'A',label:'racecar'},{id:'B',label:'banana'},{id:'C',label:'apple'},{id:'D',label:'orange'}], correct: 'A' },
-      { id: 116, text: "What is the chemical symbol for gold?", options: [{id:'A',label:'Go'},{id:'B',label:'Gd'},{id:'C',label:'Au'},{id:'D',label:'Ag'}], correct: 'C' },
-      { id: 117, text: "How many edges does a cube have?", options: [{id:'A',label:'6'},{id:'B',label:'8'},{id:'C',label:'12'},{id:'D',label:'16'}], correct: 'C' },
-      { id: 118, text: "Which one is a type of energy?", options: [{id:'A',label:'kinetic'},{id:'B',label:'potential'},{id:'C',label:'both'},{id:'D',label:'neither'}], correct: 'A' },
-      { id: 119, text: "If you have 3 apples and you take away 2, how many do you have?", options: [{id:'A',label:'1'},{id:'B',label:'2'},{id:'C',label:'3'},{id:'D',label:'5'}], correct: 'B' },
-      { id: 120, text: "What is the Roman numeral for 50?", options: [{id:'A',label:'C'},{id:'B',label:'L'},{id:'C',label:'X'},{id:'D',label:'V'}], correct: 'B' },
+      { id: 101, text: "What is 15% of 200?", options: [{id:'20',label:'20'},{id:'30',label:'30'},{id:'40',label:'40'}], correct: '30' },
+      { id: 102, text: "How many ways can you make change for $1 using coins? (approx)", options: [{id:'293',label:'293'},{id:'294',label:'294'},{id:'295',label:'295'}], correct: '293' },
+      { id: 103, text: "If a shirt costs $45 after a 10% discount, what was the original price?", options: [{id:'50',label:'50'},{id:'55',label:'55'},{id:'60',label:'60'}], correct: '50' },
+      { id: 104, text: "How many diagonals does a decagon have?", options: [{id:'35',label:'35'},{id:'40',label:'40'},{id:'45',label:'45'}], correct: '35' },
+      { id: 105, text: "The sum of two numbers is 24 and their product is 135. Find the numbers.", options: [{id:'9&15',label:'9 and 15'},{id:'10&14',label:'10 and 14'},{id:'11&13',label:'11 and 13'}], correct: '9&15' },
+      { id: 106, text: "What is the square root of 196?", options: [{id:'12',label:'12'},{id:'14',label:'14'},{id:'16',label:'16'}], correct: '14' },
+      { id: 107, text: "How many seconds in a day?", options: [{id:'86400',label:'86,400'},{id:'8640',label:'8,640'},{id:'864000',label:'864,000'}], correct: '86400' },
+      { id: 108, text: "A snail climbs 3 ft per day and slips 2 ft per night. How many days to reach a 10 ft wall?", options: [{id:'7',label:'7'},{id:'8',label:'8'},{id:'9',label:'9'}], correct: '8' },
+      { id: 109, text: "What is 7! (7 factorial)?", options: [{id:'5040',label:'5040'},{id:'720',label:'720'},{id:'40320',label:'40320'}], correct: '5040' },
+      { id: 110, text: "How many edges on an icosahedron?", options: [{id:'20',label:'20'},{id:'30',label:'30'},{id:'40',label:'40'}], correct: '30' },
+      { id: 111, text: "A rectangle has length 12 and diagonal 13. What is the width?", options: [{id:'5',label:'5'},{id:'6',label:'6'},{id:'7',label:'7'}], correct: '5' },
+      { id: 112, text: "What is 2^10?", options: [{id:'1024',label:'1024'},{id:'512',label:'512'},{id:'2048',label:'2048'}], correct: '1024' },
+      { id: 113, text: "How many prime numbers between 1 and 50?", options: [{id:'15',label:'15'},{id:'16',label:'16'},{id:'17',label:'17'}], correct: '15' },
+      { id: 114, text: "If you roll two dice, probability of sum 7?", options: [{id:'1/6',label:'1/6'},{id:'1/8',label:'1/8'},{id:'1/12',label:'1/12'}], correct: '1/6' },
+      { id: 115, text: "What is the next number in the Fibonacci sequence after 34?", options: [{id:'55',label:'55'},{id:'56',label:'56'},{id:'57',label:'57'}], correct: '55' },
+      { id: 116, text: "How many faces does a dodecahedron have?", options: [{id:'10',label:'10'},{id:'12',label:'12'},{id:'20',label:'20'}], correct: '12' },
+      { id: 117, text: "A car travels 60 miles in 1.5 hours. What is its average speed in mph?", options: [{id:'40',label:'40'},{id:'50',label:'50'},{id:'60',label:'60'}], correct: '40' },
+      { id: 118, text: "What is the cube root of 729?", options: [{id:'7',label:'7'},{id:'8',label:'8'},{id:'9',label:'9'}], correct: '9' },
+      { id: 119, text: "How many zeroes in one billion (US)?", options: [{id:'9',label:'9'},{id:'10',label:'10'},{id:'11',label:'11'}], correct: '9' },
+      { id: 120, text: "What is the Roman numeral for 1999?", options: [{id:'MCMXCIX',label:'MCMXCIX'},{id:'MCMXCVIII',label:'MCMXCVIII'},{id:'MCMXCIX',label:'MCMXCIX'}], correct: 'MCMXCIX' },
     ]
   }
 ];
@@ -263,7 +247,7 @@ const HapticManager = {
 };
 
 // ==================== MAIN GAME COMPONENT ====================
-export default function PuzzlePeakScreen() {
+export default function CountingScreen() {
   const navigation = useNavigation();
   const { width, height } = useWindowDimensions();
   
@@ -323,11 +307,8 @@ export default function PuzzlePeakScreen() {
     return a;
   };
 
-  // Generate a new extra option (for wrong attempts) - only works for number options, but we have none.
-  // We'll keep a simplified version that adds a dummy option if possible, but since all options are text,
-  // we'll just shuffle. For simplicity, we'll not add extra options for text-based questions.
+  // For text options, we only shuffle after a wrong attempt, no extra option added.
   const updateOptionsAfterWrong = () => {
-    // Just shuffle current options
     setCurrentOptions(shuffleArray(currentOptions));
   };
 
@@ -371,7 +352,7 @@ export default function PuzzlePeakScreen() {
 
   const loadHighScore = async () => {
     try {
-      const saved = await AsyncStorage.getItem('puzzlePeak_highScore');
+      const saved = await AsyncStorage.getItem('counting_highScore');
       if (saved) setHighScore(parseInt(saved));
     } catch (e) {}
   };
@@ -379,7 +360,7 @@ export default function PuzzlePeakScreen() {
   const saveHighScore = async (newScore) => {
     if (newScore > highScore) {
       setHighScore(newScore);
-      await AsyncStorage.setItem('puzzlePeak_highScore', newScore.toString());
+      await AsyncStorage.setItem('counting_highScore', newScore.toString());
     }
   };
 
@@ -593,9 +574,9 @@ export default function PuzzlePeakScreen() {
       <SafeAreaView style={[styles.container, styles.centerContent]}>
         <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
         <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-          <Text style={[styles.loadingEmoji, { fontSize: fontSize.xlarge * 2 }]}>🧩🤔💡</Text>
+          <Text style={[styles.loadingEmoji, { fontSize: fontSize.xlarge * 2 }]}>🔢🧮</Text>
         </Animated.View>
-        <Text style={[styles.loadingText, { fontSize: fontSize.large }]}>Loading Puzzle Peak...</Text>
+        <Text style={[styles.loadingText, { fontSize: fontSize.large }]}>Loading Counting Game...</Text>
         <View style={styles.progressBar}>
           <Animated.View style={[styles.progressFill, { width: "100%" }]} />
         </View>
@@ -607,7 +588,7 @@ export default function PuzzlePeakScreen() {
     return (
       <SafeAreaView style={[styles.container, styles.centerContent]}>
         <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
-        <Text style={[styles.welcomeTitle, { fontSize: fontSize.xlarge }]}>🧩 Puzzle Peak</Text>
+        <Text style={[styles.welcomeTitle, { fontSize: fontSize.xlarge }]}>🔢 Counting Game</Text>
         <Text style={[styles.welcomeSubtitle, { fontSize: fontSize.medium }]}>Choose a level!</Text>
         
         <ScrollView contentContainerStyle={styles.levelContainer} showsVerticalScrollIndicator={false}>
@@ -730,7 +711,6 @@ export default function PuzzlePeakScreen() {
 
   const renderOptions = () => {
     return currentOptions.map((opt, idx) => {
-      // All options are text objects
       const optionId = opt.id;
       const isSelected = selectedOptionId === optionId;
 
@@ -1055,16 +1035,6 @@ const styles = StyleSheet.create({
   optionDisabled: {
     opacity: 0.5,
   },
-  shapeCircle: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 3,
-    shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-  },
-  shapeEmoji: {},
   textOption: {
     borderRadius: 25,
     paddingHorizontal: 18,

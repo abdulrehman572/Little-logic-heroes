@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   View,
   Text,
@@ -40,172 +40,156 @@ const COLORS = {
   shadow: '#000000',
 };
 
-// ==================== SHAPE DATA (unused but kept for compatibility) ====================
-const SHAPES = [
-  { id: 1, name: "Circle", color: '#FFB347', emoji: "🔴", description: "round like a ball" },
-  { id: 2, name: "Square", color: '#6C9EBF', emoji: "🟦", description: "four equal sides" },
-  { id: 3, name: "Triangle", color: '#F4A261', emoji: "🔺", description: "three sides" },
-  { id: 4, name: "Star", color: '#E9B741', emoji: "⭐", description: "shining in the sky" },
-  { id: 5, name: "Heart", color: '#E57373', emoji: "❤️", description: "love shape" },
-  { id: 6, name: "Oval", color: '#81A4C6', emoji: "🥚", description: "egg-shaped" },
-  { id: 7, name: "Rectangle", color: '#B5A886', emoji: "🟦", description: "four sides, two long" },
-  { id: 8, name: "Pentagon", color: '#C4A77D', emoji: "⬟", description: "five sides" },
-  { id: 9, name: "Hexagon", color: '#A3C4A2', emoji: "⬡", description: "six sides" },
-  { id: 10, name: "Octagon", color: '#D4A5A5', emoji: "🛑", description: "eight sides" },
-  { id: 11, name: "Rhombus", color: '#B2A4D4', emoji: "💠", description: "diamond shape" },
-  { id: 12, name: "Trapezoid", color: '#A4C8D4', emoji: "📐", description: "four sides, two parallel" },
-];
-
-// ==================== LEVELS & QUESTIONS (120 brand new logic questions) ====================
+// ==================== LEVELS & QUESTIONS (120) ====================
 const LEVELS = [
   {
     name: "Level 1",
     questions: [
-      { id: 1, text: "What comes next? 2, 4, 6, ?", options: [{id:'A',label:'7'},{id:'B',label:'8'},{id:'C',label:'9'},{id:'D',label:'10'}], correct: 'B' },
-      { id: 2, text: "Which one is different? Apple, Banana, Carrot, Grape", options: [{id:'A',label:'Apple'},{id:'B',label:'Banana'},{id:'C',label:'Carrot'},{id:'D',label:'Grape'}], correct: 'C' },
-      { id: 3, text: "If you have 5 apples and you eat 2, how many left?", options: [{id:'A',label:'2'},{id:'B',label:'3'},{id:'C',label:'4'},{id:'D',label:'5'}], correct: 'B' },
-      { id: 4, text: "Which number is missing? 1, 3, 5, ?, 9", options: [{id:'A',label:'6'},{id:'B',label:'7'},{id:'C',label:'8'},{id:'D',label:'10'}], correct: 'B' },
-      { id: 5, text: "What is the opposite of hot?", options: [{id:'A',label:'warm'},{id:'B',label:'cold'},{id:'C',label:'cool'},{id:'D',label:'ice'}], correct: 'B' },
-      { id: 6, text: "Which shape has three sides?", options: [{id:'A',label:'square'},{id:'B',label:'circle'},{id:'C',label:'triangle'},{id:'D',label:'rectangle'}], correct: 'C' },
-      { id: 7, text: "How many legs does a dog have?", options: [{id:'A',label:'2'},{id:'B',label:'4'},{id:'C',label:'6'},{id:'D',label:'8'}], correct: 'B' },
-      { id: 8, text: "Which word is a color?", options: [{id:'A',label:'run'},{id:'B',label:'red'},{id:'C',label:'read'},{id:'D',label:'rod'}], correct: 'B' },
-      { id: 9, text: "What is 3 + 4?", options: [{id:'A',label:'6'},{id:'B',label:'7'},{id:'C',label:'8'},{id:'D',label:'9'}], correct: 'B' },
-      { id: 10, text: "Which one is a fruit?", options: [{id:'A',label:'carrot'},{id:'B',label:'banana'},{id:'C',label:'potato'},{id:'D',label:'onion'}], correct: 'B' },
-      { id: 11, text: "What comes after Monday?", options: [{id:'A',label:'Sunday'},{id:'B',label:'Tuesday'},{id:'C',label:'Wednesday'},{id:'D',label:'Friday'}], correct: 'B' },
-      { id: 12, text: "Which is the smallest?", options: [{id:'A',label:'1'},{id:'B',label:'5'},{id:'C',label:'10'},{id:'D',label:'20'}], correct: 'A' },
-      { id: 13, text: "Which one is round?", options: [{id:'A',label:'book'},{id:'B',label:'ball'},{id:'C',label:'box'},{id:'D',label:'brick'}], correct: 'B' },
-      { id: 14, text: "How many days in a week?", options: [{id:'A',label:'5'},{id:'B',label:'6'},{id:'C',label:'7'},{id:'D',label:'8'}], correct: 'C' },
-      { id: 15, text: "Which one can fly?", options: [{id:'A',label:'fish'},{id:'B',label:'bird'},{id:'C',label:'dog'},{id:'D',label:'cat'}], correct: 'B' },
-      { id: 16, text: "What is 10 - 3?", options: [{id:'A',label:'6'},{id:'B',label:'7'},{id:'C',label:'8'},{id:'D',label:'9'}], correct: 'B' },
-      { id: 17, text: "Which is a number?", options: [{id:'A',label:'tree'},{id:'B',label:'three'},{id:'C',label:'free'},{id:'D',label:'see'}], correct: 'B' },
-      { id: 18, text: "Which one is a toy?", options: [{id:'A',label:'doll'},{id:'B',label:'cup'},{id:'C',label:'plate'},{id:'D',label:'spoon'}], correct: 'A' },
-      { id: 19, text: "What is the first letter of 'cat'?", options: [{id:'A',label:'a'},{id:'B',label:'b'},{id:'C',label:'c'},{id:'D',label:'d'}], correct: 'C' },
-      { id: 20, text: "Which one is a month?", options: [{id:'A',label:'May'},{id:'B',label:'Car'},{id:'C',label:'Dog'},{id:'D',label:'Book'}], correct: 'A' },
+      { id: 1, text: "What letter does 'Apple' start with?", options: [{id:'A',label:'A'},{id:'B',label:'B'},{id:'C',label:'C'}], correct: 'A' },
+      { id: 2, text: "Which word begins with 'B'?", options: [{id:'bat',label:'Bat'},{id:'cat',label:'Cat'},{id:'dog',label:'Dog'}], correct: 'bat' },
+      { id: 3, text: "What is the first letter of 'Cat'?", options: [{id:'C',label:'C'},{id:'K',label:'K'},{id:'S',label:'S'}], correct: 'C' },
+      { id: 4, text: "Which letter comes after A?", options: [{id:'A',label:'A'},{id:'B',label:'B'},{id:'C',label:'C'}], correct: 'B' },
+      { id: 5, text: "What letter does 'Dog' end with?", options: [{id:'D',label:'D'},{id:'O',label:'O'},{id:'G',label:'G'}], correct: 'G' },
+      { id: 6, text: "Which is a vowel?", options: [{id:'A',label:'A'},{id:'B',label:'B'},{id:'C',label:'C'}], correct: 'A' },
+      { id: 7, text: "What is the last letter of 'Egg'?", options: [{id:'E',label:'E'},{id:'G',label:'G'},{id:'G2',label:'G'},{id:'G',label:'G'}], correct: 'G' }, // simplified
+      { id: 8, text: "How many letters are in 'Hi'?", options: [{id:'1',label:'1'},{id:'2',label:'2'},{id:'3',label:'3'}], correct: '2' },
+      { id: 9, text: "Which word starts with 'M'?", options: [{id:'moon',label:'Moon'},{id:'sun',label:'Sun'},{id:'star',label:'Star'}], correct: 'moon' },
+      { id: 10, text: "What is the second letter of 'Red'?", options: [{id:'R',label:'R'},{id:'E',label:'E'},{id:'D',label:'D'}], correct: 'E' },
+      { id: 11, text: "Which letter comes before C?", options: [{id:'A',label:'A'},{id:'B',label:'B'},{id:'C',label:'C'}], correct: 'B' },
+      { id: 12, text: "Which word is spelled correctly?", options: [{id:'cat',label:'cat'},{id:'kat',label:'kat'},{id:'catt',label:'catt'}], correct: 'cat' },
+      { id: 13, text: "What letter is missing? A, B, _, D", options: [{id:'C',label:'C'},{id:'E',label:'E'},{id:'F',label:'F'}], correct: 'C' },
+      { id: 14, text: "Which word has 3 letters?", options: [{id:'dog',label:'dog'},{id:'fish',label:'fish'},{id:'bird',label:'bird'}], correct: 'dog' },
+      { id: 15, text: "What is the first letter of 'Zebra'?", options: [{id:'Z',label:'Z'},{id:'X',label:'X'},{id:'Y',label:'Y'}], correct: 'Z' },
+      { id: 16, text: "Which letter is a consonant?", options: [{id:'A',label:'A'},{id:'E',label:'E'},{id:'T',label:'T'}], correct: 'T' },
+      { id: 17, text: "What is the last letter of 'Ball'?", options: [{id:'B',label:'B'},{id:'A',label:'A'},{id:'L',label:'L'}], correct: 'L' },
+      { id: 18, text: "How many vowels are in 'cat'?", options: [{id:'1',label:'1'},{id:'2',label:'2'},{id:'3',label:'3'}], correct: '1' },
+      { id: 19, text: "Which word starts with 'S'?", options: [{id:'sun',label:'sun'},{id:'run',label:'run'},{id:'fun',label:'fun'}], correct: 'sun' },
+      { id: 20, text: "What is the middle letter of 'bat'?", options: [{id:'B',label:'B'},{id:'A',label:'A'},{id:'T',label:'T'}], correct: 'A' },
     ]
   },
   {
     name: "Level 2",
     questions: [
-      { id: 21, text: "What comes next? 5, 10, 15, ?", options: [{id:'A',label:'18'},{id:'B',label:'20'},{id:'C',label:'25'},{id:'D',label:'30'}], correct: 'B' },
-      { id: 22, text: "Which one is not a primary color?", options: [{id:'A',label:'red'},{id:'B',label:'blue'},{id:'C',label:'yellow'},{id:'D',label:'green'}], correct: 'D' },
-      { id: 23, text: "If you have 3 pairs of shoes, how many shoes?", options: [{id:'A',label:'3'},{id:'B',label:'4'},{id:'C',label:'5'},{id:'D',label:'6'}], correct: 'D' },
-      { id: 24, text: "Which word is a number?", options: [{id:'A',label:'ate'},{id:'B',label:'eight'},{id:'C',label:'height'},{id:'D',label:'weight'}], correct: 'B' },
-      { id: 25, text: "Complete the pattern: ★, ★★, ★★★, ?", options: [{id:'A',label:'★'},{id:'B',label:'★★'},{id:'C',label:'★★★★'},{id:'D',label:'★★★★★'}], correct: 'C' },
-      { id: 26, text: "Which animal says 'meow'?", options: [{id:'A',label:'dog'},{id:'B',label:'cat'},{id:'C',label:'cow'},{id:'D',label:'pig'}], correct: 'B' },
-      { id: 27, text: "How many sides does a square have?", options: [{id:'A',label:'3'},{id:'B',label:'4'},{id:'C',label:'5'},{id:'D',label:'6'}], correct: 'B' },
-      { id: 28, text: "Which one is a vehicle?", options: [{id:'A',label:'car'},{id:'B',label:'tree'},{id:'C',label:'house'},{id:'D',label:'ball'}], correct: 'A' },
-      { id: 29, text: "What is 12 divided by 3?", options: [{id:'A',label:'3'},{id:'B',label:'4'},{id:'C',label:'5'},{id:'D',label:'6'}], correct: 'B' },
-      { id: 30, text: "Which one is a season?", options: [{id:'A',label:'winter'},{id:'B',label:'water'},{id:'C',label:'wind'},{id:'D',label:'window'}], correct: 'A' },
-      { id: 31, text: "Which letter comes after P?", options: [{id:'A',label:'O'},{id:'B',label:'Q'},{id:'C',label:'R'},{id:'D',label:'S'}], correct: 'B' },
-      { id: 32, text: "Which one is a continent?", options: [{id:'A',label:'Asia'},{id:'B',label:'Atlantic'},{id:'C',label:'Arctic'},{id:'D',label:'Alps'}], correct: 'A' },
-      { id: 33, text: "How many minutes in an hour?", options: [{id:'A',label:'30'},{id:'B',label:'60'},{id:'C',label:'90'},{id:'D',label:'120'}], correct: 'B' },
-      { id: 34, text: "Which one is a tool?", options: [{id:'A',label:'hammer'},{id:'B',label:'milk'},{id:'C',label:'bread'},{id:'D',label:'chair'}], correct: 'A' },
-      { id: 35, text: "What is the opposite of big?", options: [{id:'A',label:'tall'},{id:'B',label:'large'},{id:'C',label:'small'},{id:'D',label:'huge'}], correct: 'C' },
-      { id: 36, text: "Which number is even?", options: [{id:'A',label:'3'},{id:'B',label:'5'},{id:'C',label:'7'},{id:'D',label:'8'}], correct: 'D' },
-      { id: 37, text: "Which word means the same as 'happy'?", options: [{id:'A',label:'sad'},{id:'B',label:'glad'},{id:'C',label:'mad'},{id:'D',label:'bad'}], correct: 'B' },
-      { id: 38, text: "Which one is a planet?", options: [{id:'A',label:'Mars'},{id:'B',label:'Moon'},{id:'C',label:'Sun'},{id:'D',label:'Star'}], correct: 'A' },
-      { id: 39, text: "What is 9 + 6?", options: [{id:'A',label:'14'},{id:'B',label:'15'},{id:'C',label:'16'},{id:'D',label:'17'}], correct: 'B' },
-      { id: 40, text: "Which one is a drink?", options: [{id:'A',label:'water'},{id:'B',label:'bread'},{id:'C',label:'rice'},{id:'D',label:'meat'}], correct: 'A' },
+      { id: 21, text: "What letter comes after M?", options: [{id:'N',label:'N'},{id:'L',label:'L'},{id:'O',label:'O'}], correct: 'N' },
+      { id: 22, text: "Which word is a color?", options: [{id:'red',label:'red'},{id:'run',label:'run'},{id:'rat',label:'rat'}], correct: 'red' },
+      { id: 23, text: "Spell 'dog'", options: [{id:'dog',label:'d-o-g'},{id:'dgo',label:'d-g-o'},{id:'god',label:'g-o-d'}], correct: 'dog' },
+      { id: 24, text: "What is the first letter of 'Frog'?", options: [{id:'F',label:'F'},{id:'G',label:'G'},{id:'R',label:'R'}], correct: 'F' },
+      { id: 25, text: "Which word has the same beginning as 'tree'?", options: [{id:'train',label:'train'},{id:'bus',label:'bus'},{id:'car',label:'car'}], correct: 'train' },
+      { id: 26, text: "How many letters in 'book'?", options: [{id:'3',label:'3'},{id:'4',label:'4'},{id:'5',label:'5'}], correct: '4' },
+      { id: 27, text: "Which letter is missing? P, Q, R, _, T", options: [{id:'S',label:'S'},{id:'U',label:'U'},{id:'V',label:'V'}], correct: 'S' },
+      { id: 28, text: "What is the last letter of 'mouse'?", options: [{id:'M',label:'M'},{id:'O',label:'O'},{id:'E',label:'E'}], correct: 'E' },
+      { id: 29, text: "Which word rhymes with 'cat'?", options: [{id:'hat',label:'hat'},{id:'dog',label:'dog'},{id:'sun',label:'sun'}], correct: 'hat' },
+      { id: 30, text: "What letter does 'ship' start with?", options: [{id:'S',label:'S'},{id:'H',label:'H'},{id:'P',label:'P'}], correct: 'S' },
+      { id: 31, text: "Which word has 4 letters?", options: [{id:'book',label:'book'},{id:'pen',label:'pen'},{id:'cup',label:'cup'}], correct: 'book' },
+      { id: 32, text: "What is the third letter of 'frog'?", options: [{id:'F',label:'F'},{id:'R',label:'R'},{id:'O',label:'O'}], correct: 'O' },
+      { id: 33, text: "Which letter is a vowel?", options: [{id:'E',label:'E'},{id:'G',label:'G'},{id:'H',label:'H'}], correct: 'E' },
+      { id: 34, text: "Spell 'fish'", options: [{id:'fish',label:'f-i-s-h'},{id:'fsh',label:'f-s-h'},{id:'fihs',label:'f-i-h-s'}], correct: 'fish' },
+      { id: 35, text: "What comes after Z?", options: [{id:'A',label:'A'},{id:'Y',label:'Y'},{id:'none',label:'None'}], correct: 'none' },
+      { id: 36, text: "Which word is a number?", options: [{id:'two',label:'two'},{id:'to',label:'to'},{id:'too',label:'too'}], correct: 'two' },
+      { id: 37, text: "What is the first letter of 'queen'?", options: [{id:'Q',label:'Q'},{id:'U',label:'U'},{id:'E',label:'E'}], correct: 'Q' },
+      { id: 38, text: "How many consonants in 'bat'?", options: [{id:'1',label:'1'},{id:'2',label:'2'},{id:'3',label:'3'}], correct: '2' },
+      { id: 39, text: "Which word ends with 'g'?", options: [{id:'dog',label:'dog'},{id:'cat',label:'cat'},{id:'rat',label:'rat'}], correct: 'dog' },
+      { id: 40, text: "What is the second letter of 'zoo'?", options: [{id:'Z',label:'Z'},{id:'O',label:'O'},{id:'O2',label:'O'}], correct: 'O' },
     ]
   },
   {
     name: "Level 3",
     questions: [
-      { id: 41, text: "What is the next number? 2, 3, 5, 8, ?", options: [{id:'A',label:'11'},{id:'B',label:'12'},{id:'C',label:'13'},{id:'D',label:'14'}], correct: 'B' },
-      { id: 42, text: "Which word does not belong? run, walk, jump, eat", options: [{id:'A',label:'run'},{id:'B',label:'walk'},{id:'C',label:'jump'},{id:'D',label:'eat'}], correct: 'D' },
-      { id: 43, text: "If a shirt costs $20 and you have $15, how much more do you need?", options: [{id:'A',label:'5'},{id:'B',label:'10'},{id:'C',label:'15'},{id:'D',label:'20'}], correct: 'A' },
-      { id: 44, text: "Which number is odd?", options: [{id:'A',label:'12'},{id:'B',label:'14'},{id:'C',label:'16'},{id:'D',label:'17'}], correct: 'D' },
-      { id: 45, text: "Complete the analogy: Hand is to glove as foot is to ?", options: [{id:'A',label:'shoe'},{id:'B',label:'sock'},{id:'C',label:'pant'},{id:'D',label:'hat'}], correct: 'B' },
-      { id: 46, text: "What is the capital of France?", options: [{id:'A',label:'London'},{id:'B',label:'Paris'},{id:'C',label:'Rome'},{id:'D',label:'Berlin'}], correct: 'B' },
-      { id: 47, text: "How many hours in a day?", options: [{id:'A',label:'12'},{id:'B',label:'24'},{id:'C',label:'36'},{id:'D',label:'48'}], correct: 'B' },
-      { id: 48, text: "Which one is a musical instrument?", options: [{id:'A',label:'piano'},{id:'B',label:'table'},{id:'C',label:'chair'},{id:'D',label:'bed'}], correct: 'A' },
-      { id: 49, text: "What is 15 - 7?", options: [{id:'A',label:'7'},{id:'B',label:'8'},{id:'C',label:'9'},{id:'D',label:'10'}], correct: 'B' },
-      { id: 50, text: "Which word is a verb?", options: [{id:'A',label:'run'},{id:'B',label:'red'},{id:'C',label:'road'},{id:'D',label:'roof'}], correct: 'A' },
-      { id: 51, text: "Which shape has four equal sides?", options: [{id:'A',label:'rectangle'},{id:'B',label:'square'},{id:'C',label:'triangle'},{id:'D',label:'circle'}], correct: 'B' },
-      { id: 52, text: "Which one is a mammal?", options: [{id:'A',label:'dolphin'},{id:'B',label:'fish'},{id:'C',label:'shark'},{id:'D',label:'crab'}], correct: 'A' },
-      { id: 53, text: "What is 4 times 6?", options: [{id:'A',label:'20'},{id:'B',label:'24'},{id:'C',label:'28'},{id:'D',label:'30'}], correct: 'B' },
-      { id: 54, text: "Which one is a metal?", options: [{id:'A',label:'iron'},{id:'B',label:'wood'},{id:'C',label:'plastic'},{id:'D',label:'paper'}], correct: 'A' },
-      { id: 55, text: "Which word is a synonym for 'quick'?", options: [{id:'A',label:'slow'},{id:'B',label:'fast'},{id:'C',label:'last'},{id:'D',label:'past'}], correct: 'B' },
-      { id: 56, text: "How many centimeters in a meter?", options: [{id:'A',label:'10'},{id:'B',label:'100'},{id:'C',label:'1000'},{id:'D',label:'10000'}], correct: 'B' },
-      { id: 57, text: "Which one is a type of tree?", options: [{id:'A',label:'oak'},{id:'B',label:'oat'},{id:'C',label:'oar'},{id:'D',label:'oil'}], correct: 'A' },
-      { id: 58, text: "What is the next letter? A, C, E, G, ?", options: [{id:'A',label:'H'},{id:'B',label:'I'},{id:'C',label:'J'},{id:'D',label:'K'}], correct: 'B' },
-      { id: 59, text: "Which one is a unit of time?", options: [{id:'A',label:'second'},{id:'B',label:'meter'},{id:'C',label:'liter'},{id:'D',label:'gram'}], correct: 'A' },
-      { id: 60, text: "If you have a dozen eggs, how many?", options: [{id:'A',label:'10'},{id:'B',label:'12'},{id:'C',label:'14'},{id:'D',label:'16'}], correct: 'B' },
+      { id: 41, text: "Which word comes first in the dictionary: 'apple' or 'banana'?", options: [{id:'apple',label:'apple'},{id:'banana',label:'banana'}], correct: 'apple' },
+      { id: 42, text: "Spell 'house'", options: [{id:'house',label:'h-o-u-s-e'},{id:'hous',label:'h-o-u-s'},{id:'hoose',label:'h-o-o-s-e'}], correct: 'house' },
+      { id: 43, text: "What is the missing letter? b _ g", options: [{id:'a',label:'a'},{id:'e',label:'e'},{id:'i',label:'i'}], correct: 'a' },
+      { id: 44, text: "Which word has the same vowel sound as 'cake'?", options: [{id:'lake',label:'lake'},{id:'cat',label:'cat'},{id:'cow',label:'cow'}], correct: 'lake' },
+      { id: 45, text: "How many letters in 'pencil'?", options: [{id:'5',label:'5'},{id:'6',label:'6'},{id:'7',label:'7'}], correct: '6' },
+      { id: 46, text: "What is the first letter of 'knight' (silent letter)?", options: [{id:'K',label:'K'},{id:'N',label:'N'},{id:'I',label:'I'}], correct: 'K' },
+      { id: 47, text: "Which word is a fruit?", options: [{id:'apple',label:'apple'},{id:'table',label:'table'},{id:'chair',label:'chair'}], correct: 'apple' },
+      { id: 48, text: "Spell 'elephant'", options: [{id:'elephant',label:'e-l-e-p-h-a-n-t'},{id:'elefant',label:'e-l-e-f-a-n-t'},{id:'elephent',label:'e-l-e-p-h-e-n-t'}], correct: 'elephant' },
+      { id: 49, text: "What letter is halfway through the alphabet?", options: [{id:'M',label:'M'},{id:'N',label:'N'},{id:'O',label:'O'}], correct: 'M' },
+      { id: 50, text: "Which word has a silent 'e' at the end?", options: [{id:'name',label:'name'},{id:'man',label:'man'},{id:'men',label:'men'}], correct: 'name' },
+      { id: 51, text: "How many vowels in 'school'?", options: [{id:'2',label:'2'},{id:'3',label:'3'},{id:'4',label:'4'}], correct: '2' },
+      { id: 52, text: "Which word rhymes with 'light'?", options: [{id:'night',label:'night'},{id:'day',label:'day'},{id:'sun',label:'sun'}], correct: 'night' },
+      { id: 53, text: "What is the last letter of 'world'?", options: [{id:'D',label:'D'},{id:'L',label:'L'},{id:'R',label:'R'}], correct: 'D' },
+      { id: 54, text: "Spell 'giraffe'", options: [{id:'giraffe',label:'g-i-r-a-f-f-e'},{id:'girafe',label:'g-i-r-a-f-e'},{id:'jiraffe',label:'j-i-r-a-f-f-e'}], correct: 'giraffe' },
+      { id: 55, text: "Which letter appears twice in 'banana'?", options: [{id:'A',label:'A'},{id:'B',label:'B'},{id:'N',label:'N'}], correct: 'A' },
+      { id: 56, text: "What is the third letter of 'computer'?", options: [{id:'C',label:'C'},{id:'O',label:'O'},{id:'M',label:'M'}], correct: 'M' },
+      { id: 57, text: "Which word has 5 letters?", options: [{id:'table',label:'table'},{id:'desk',label:'desk'},{id:'chair',label:'chair'}], correct: 'table' },
+      { id: 58, text: "Spell 'butterfly'", options: [{id:'butterfly',label:'b-u-t-t-e-r-f-l-y'},{id:'buterfly',label:'b-u-t-e-r-f-l-y'},{id:'butterfli',label:'b-u-t-t-e-r-f-l-i'}], correct: 'butterfly' },
+      { id: 59, text: "Which word is the odd one out? cat, dog, bird, car", options: [{id:'car',label:'car'},{id:'cat',label:'cat'},{id:'dog',label:'dog'}], correct: 'car' },
+      { id: 60, text: "What letter is missing? A, C, E, G, _", options: [{id:'H',label:'H'},{id:'I',label:'I'},{id:'J',label:'J'}], correct: 'I' },
     ]
   },
   {
-    name: "Level 4 ",
+    name: "Level 4",
     questions: [
-      { id: 61, text: "What comes next? 3, 6, 11, 18, ?", options: [{id:'A',label:'25'},{id:'B',label:'26'},{id:'C',label:'27'},{id:'D',label:'28'}], correct: 'C' },
-      { id: 62, text: "Which word is the odd one out? apple, banana, orange, carrot", options: [{id:'A',label:'apple'},{id:'B',label:'banana'},{id:'C',label:'orange'},{id:'D',label:'carrot'}], correct: 'D' },
-      { id: 63, text: "If today is Monday, what day is 3 days later?", options: [{id:'A',label:'Tuesday'},{id:'B',label:'Wednesday'},{id:'C',label:'Thursday'},{id:'D',label:'Friday'}], correct: 'C' },
-      { id: 64, text: "Which number is a prime?", options: [{id:'A',label:'9'},{id:'B',label:'15'},{id:'C',label:'17'},{id:'D',label:'21'}], correct: 'C' },
-      { id: 65, text: "Complete the analogy: Bird is to sky as fish is to ?", options: [{id:'A',label:'sea'},{id:'B',label:'land'},{id:'C',label:'air'},{id:'D',label:'tree'}], correct: 'A' },
-      { id: 66, text: "What is the square root of 81?", options: [{id:'A',label:'7'},{id:'B',label:'8'},{id:'C',label:'9'},{id:'D',label:'10'}], correct: 'C' },
-      { id: 67, text: "Which one is a continent?", options: [{id:'A',label:'Africa'},{id:'B',label:'Europe'},{id:'C',label:'Atlantic'},{id:'D',label:'Pacific'}], correct: 'A' },
-      { id: 68, text: "How many sides does a pentagon have?", options: [{id:'A',label:'4'},{id:'B',label:'5'},{id:'C',label:'6'},{id:'D',label:'7'}], correct: 'B' },
-      { id: 69, text: "Which word means the opposite of 'light'?", options: [{id:'A',label:'dark'},{id:'B',label:'heavy'},{id:'C',label:'bright'},{id:'D',label:'shine'}], correct: 'A' },
-      { id: 70, text: "What is 18 + 7?", options: [{id:'A',label:'24'},{id:'B',label:'25'},{id:'C',label:'26'},{id:'D',label:'27'}], correct: 'B' },
-      { id: 71, text: "Which one is a programming language?", options: [{id:'A',label:'Python'},{id:'B',label:'Cobra'},{id:'C',label:'Viper'},{id:'D',label:'Anaconda'}], correct: 'A' },
-      { id: 72, text: "How many degrees in a right angle?", options: [{id:'A',label:'45'},{id:'B',label:'90'},{id:'C',label:'180'},{id:'D',label:'360'}], correct: 'B' },
-      { id: 73, text: "Which one is a gas?", options: [{id:'A',label:'oxygen'},{id:'B',label:'water'},{id:'C',label:'sand'},{id:'D',label:'rock'}], correct: 'A' },
-      { id: 74, text: "What is the missing number? 2, 4, 8, 16, ?", options: [{id:'A',label:'24'},{id:'B',label:'32'},{id:'C',label:'64'},{id:'D',label:'128'}], correct: 'B' },
-      { id: 75, text: "Which word is a profession?", options: [{id:'A',label:'teacher'},{id:'B',label:'student'},{id:'C',label:'school'},{id:'D',label:'book'}], correct: 'A' },
-      { id: 76, text: "Which one is a country?", options: [{id:'A',label:'Canada'},{id:'B',label:'Chicago'},{id:'C',label:'California'},{id:'D',label:'Cairo'}], correct: 'A' },
-      { id: 77, text: "What is 20% of 50?", options: [{id:'A',label:'5'},{id:'B',label:'10'},{id:'C',label:'15'},{id:'D',label:'20'}], correct: 'B' },
-      { id: 78, text: "Which one is a type of bird?", options: [{id:'A',label:'eagle'},{id:'B',label:'lion'},{id:'C',label:'tiger'},{id:'D',label:'bear'}], correct: 'A' },
-      { id: 79, text: "Which letter is a vowel?", options: [{id:'A',label:'B'},{id:'B',label:'C'},{id:'C',label:'D'},{id:'D',label:'E'}], correct: 'D' },
-      { id: 80, text: "If you have 4 quarters, how many dollars?", options: [{id:'A',label:'0.5'},{id:'B',label:'1'},{id:'C',label:'2'},{id:'D',label:'4'}], correct: 'B' },
+      { id: 61, text: "Which word comes last alphabetically? 'apple', 'banana', 'cherry'", options: [{id:'cherry',label:'cherry'},{id:'banana',label:'banana'},{id:'apple',label:'apple'}], correct: 'cherry' },
+      { id: 62, text: "Spell 'mountain'", options: [{id:'mountain',label:'m-o-u-n-t-a-i-n'},{id:'mountin',label:'m-o-u-n-t-i-n'},{id:'moutain',label:'m-o-u-t-a-i-n'}], correct: 'mountain' },
+      { id: 63, text: "What is the first vowel in 'rhythm'?", options: [{id:'y',label:'y'},{id:'h',label:'h'},{id:'none',label:'none'}], correct: 'none' },
+      { id: 64, text: "How many syllables in 'elephant'?", options: [{id:'2',label:'2'},{id:'3',label:'3'},{id:'4',label:'4'}], correct: '3' },
+      { id: 65, text: "Which word has a silent 'k'?", options: [{id:'knee',label:'knee'},{id:'kite',label:'kite'},{id:'kangaroo',label:'kangaroo'}], correct: 'knee' },
+      { id: 66, text: "Spell 'dinosaur'", options: [{id:'dinosaur',label:'d-i-n-o-s-a-u-r'},{id:'dinasaur',label:'d-i-n-a-s-a-u-r'},{id:'dinosor',label:'d-i-n-o-s-o-r'}], correct: 'dinosaur' },
+      { id: 67, text: "What is the last letter of the alphabet?", options: [{id:'Z',label:'Z'},{id:'Y',label:'Y'},{id:'A',label:'A'}], correct: 'Z' },
+      { id: 68, text: "Which word is a verb?", options: [{id:'run',label:'run'},{id:'red',label:'red'},{id:'road',label:'road'}], correct: 'run' },
+      { id: 69, text: "Spell 'library'", options: [{id:'library',label:'l-i-b-r-a-r-y'},{id:'libary',label:'l-i-b-a-r-y'},{id:'libray',label:'l-i-b-r-a-y'}], correct: 'library' },
+      { id: 70, text: "How many letters in 'Wednesday'?", options: [{id:'9',label:'9'},{id:'8',label:'8'},{id:'10',label:'10'}], correct: '9' },
+      { id: 71, text: "Which word has the same ending sound as 'laugh'?", options: [{id:'half',label:'half'},{id:'calf',label:'calf'},{id:'graph',label:'graph'}], correct: 'graph' },
+      { id: 72, text: "What is the 10th letter of the alphabet?", options: [{id:'J',label:'J'},{id:'K',label:'K'},{id:'L',label:'L'}], correct: 'J' },
+      { id: 73, text: "Spell 'chocolate'", options: [{id:'chocolate',label:'c-h-o-c-o-l-a-t-e'},{id:'choclate',label:'c-h-o-c-l-a-t-e'},{id:'chocolat',label:'c-h-o-c-o-l-a-t'}], correct: 'chocolate' },
+      { id: 74, text: "Which word is a homophone for 'see'?", options: [{id:'sea',label:'sea'},{id:'saw',label:'saw'},{id:'say',label:'say'}], correct: 'sea' },
+      { id: 75, text: "How many consonants in 'strengths'?", options: [{id:'6',label:'6'},{id:'7',label:'7'},{id:'8',label:'8'}], correct: '7' },
+      { id: 76, text: "What is the first letter of 'psychology' (silent)?", options: [{id:'P',label:'P'},{id:'S',label:'S'},{id:'Y',label:'Y'}], correct: 'P' },
+      { id: 77, text: "Spell 'strawberry'", options: [{id:'strawberry',label:'s-t-r-a-w-b-e-r-r-y'},{id:'strawbery',label:'s-t-r-a-w-b-e-r-y'},{id:'strawberri',label:'s-t-r-a-w-b-e-r-r-i'}], correct: 'strawberry' },
+      { id: 78, text: "Which word is an antonym of 'hot'?", options: [{id:'cold',label:'cold'},{id:'cool',label:'cool'},{id:'warm',label:'warm'}], correct: 'cold' },
+      { id: 79, text: "How many vowels in 'queue'?", options: [{id:'2',label:'2'},{id:'3',label:'3'},{id:'4',label:'4'}], correct: '3' },
+      { id: 80, text: "What is the missing letter? S, M, T, W, T, F, _ (days of week)", options: [{id:'S',label:'S'},{id:'M',label:'M'},{id:'T',label:'T'}], correct: 'S' },
     ]
   },
   {
     name: "Level 5",
     questions: [
-      { id: 81, text: "What is the next number? 1, 4, 9, 16, ?", options: [{id:'A',label:'20'},{id:'B',label:'25'},{id:'C',label:'30'},{id:'D',label:'36'}], correct: 'B' },
-      { id: 82, text: "Which word does not belong? happy, joyful, sad, elated", options: [{id:'A',label:'happy'},{id:'B',label:'joyful'},{id:'C',label:'sad'},{id:'D',label:'elated'}], correct: 'C' },
-      { id: 83, text: "If a train leaves at 3:15 and arrives at 5:45, how long is the journey?", options: [{id:'A',label:'2h'},{id:'B',label:'2h15m'},{id:'C',label:'2h30m'},{id:'D',label:'3h'}], correct: 'C' },
-      { id: 84, text: "Which number is divisible by 3?", options: [{id:'A',label:'14'},{id:'B',label:'16'},{id:'C',label:'18'},{id:'D',label:'20'}], correct: 'C' },
-      { id: 85, text: "Complete the analogy: Book is to read as food is to ?", options: [{id:'A',label:'cook'},{id:'B',label:'eat'},{id:'C',label:'buy'},{id:'D',label:'sell'}], correct: 'B' },
-      { id: 86, text: "What is the value of π approximated?", options: [{id:'A',label:'2.14'},{id:'B',label:'3.14'},{id:'C',label:'4.14'},{id:'D',label:'5.14'}], correct: 'B' },
-      { id: 87, text: "Which one is a noble gas?", options: [{id:'A',label:'Helium'},{id:'B',label:'Gold'},{id:'C',label:'Silver'},{id:'D',label:'Iron'}], correct: 'A' },
-      { id: 88, text: "How many millimeters in a centimeter?", options: [{id:'A',label:'10'},{id:'B',label:'100'},{id:'C',label:'1000'},{id:'D',label:'0.1'}], correct: 'A' },
-      { id: 89, text: "Which word is a synonym for 'difficult'?", options: [{id:'A',label:'easy'},{id:'B',label:'soft'},{id:'C',label:'hard'},{id:'D',label:'light'}], correct: 'C' },
-      { id: 90, text: "What is 36 divided by 4?", options: [{id:'A',label:'8'},{id:'B',label:'9'},{id:'C',label:'10'},{id:'D',label:'11'}], correct: 'B' },
-      { id: 91, text: "Which one is a continent?", options: [{id:'A',label:'Australia'},{id:'B',label:'Greenland'},{id:'C',label:'Iceland'},{id:'D',label:'New Zealand'}], correct: 'A' },
-      { id: 92, text: "How many sides does a hexagon have?", options: [{id:'A',label:'5'},{id:'B',label:'6'},{id:'C',label:'7'},{id:'D',label:'8'}], correct: 'B' },
-      { id: 93, text: "Which word is a type of fruit?", options: [{id:'A',label:'strawberry'},{id:'B',label:'carrot'},{id:'C',label:'potato'},{id:'D',label:'onion'}], correct: 'A' },
-      { id: 94, text: "What is the cube of 3?", options: [{id:'A',label:'9'},{id:'B',label:'27'},{id:'C',label:'81'},{id:'D',label:'99'}], correct: 'B' },
-      { id: 95, text: "Which one is a planet?", options: [{id:'A',label:'Jupiter'},{id:'B',label:'Pluto'},{id:'C',label:'Moon'},{id:'D',label:'Sun'}], correct: 'A' },
-      { id: 96, text: "If you have 5 dimes, how many cents?", options: [{id:'A',label:'5'},{id:'B',label:'10'},{id:'C',label:'50'},{id:'D',label:'100'}], correct: 'C' },
-      { id: 97, text: "Which letter is the 10th letter of the alphabet?", options: [{id:'A',label:'H'},{id:'B',label:'I'},{id:'C',label:'J'},{id:'D',label:'K'}], correct: 'C' },
-      { id: 98, text: "What is the sum of angles in a triangle?", options: [{id:'A',label:'90'},{id:'B',label:'180'},{id:'C',label:'270'},{id:'D',label:'360'}], correct: 'B' },
-      { id: 99, text: "Which one is a mode of transportation?", options: [{id:'A',label:'bicycle'},{id:'B',label:'tree'},{id:'C',label:'cloud'},{id:'D',label:'river'}], correct: 'A' },
-      { id: 100, text: "What is 8 x 7?", options: [{id:'A',label:'54'},{id:'B',label:'56'},{id:'C',label:'58'},{id:'D',label:'60'}], correct: 'B' },
+      { id: 81, text: "Which word is spelled correctly?", options: [{id:'accommodate',label:'accommodate'},{id:'accomodate',label:'accomodate'},{id:'acommodate',label:'acommodate'}], correct: 'accommodate' },
+      { id: 82, text: "What is the longest word in English (commonly known)?", options: [{id:'pneumonoultramicroscopicsilicovolcanoconiosis',label:'pneumonoultramicroscopicsilicovolcanoconiosis'},{id:'antidisestablishment',label:'antidisestablishment'},{id:'floccinaucinihilipilification',label:'floccinaucinihilipilification'}], correct: 'pneumonoultramicroscopicsilicovolcanoconiosis' },
+      { id: 83, text: "How many letters in 'antidisestablishment'?", options: [{id:'28',label:'28'},{id:'30',label:'30'},{id:'32',label:'32'}], correct: '28' },
+      { id: 84, text: "Which word has a silent 'b'?", options: [{id:'doubt',label:'doubt'},{id:'baby',label:'baby'},{id:'bat',label:'bat'}], correct: 'doubt' },
+      { id: 85, text: "Spell 'entrepreneur'", options: [{id:'entrepreneur',label:'e-n-t-r-e-p-r-e-n-e-u-r'},{id:'entrepeneur',label:'e-n-t-r-e-p-e-n-e-u-r'},{id:'entrepraneur',label:'e-n-t-r-e-p-r-a-n-e-u-r'}], correct: 'entrepreneur' },
+      { id: 86, text: "What is the 15th letter of the alphabet?", options: [{id:'O',label:'O'},{id:'P',label:'P'},{id:'Q',label:'Q'}], correct: 'O' },
+      { id: 87, text: "Which word is a palindrome?", options: [{id:'racecar',label:'racecar'},{id:'banana',label:'banana'},{id:'apple',label:'apple'}], correct: 'racecar' },
+      { id: 88, text: "Spell 'pharaoh'", options: [{id:'pharaoh',label:'p-h-a-r-a-o-h'},{id:'pharoah',label:'p-h-a-r-o-a-h'},{id:'pharao',label:'p-h-a-r-a-o'}], correct: 'pharaoh' },
+      { id: 89, text: "How many syllables in 'onomatopoeia'?", options: [{id:'5',label:'5'},{id:'6',label:'6'},{id:'7',label:'7'}], correct: '6' },
+      { id: 90, text: "Which word is a synonym for 'quick'?", options: [{id:'fast',label:'fast'},{id:'slow',label:'slow'},{id:'large',label:'large'}], correct: 'fast' },
+      { id: 91, text: "What is the first letter of 'xylophone'?", options: [{id:'X',label:'X'},{id:'Z',label:'Z'},{id:'Y',label:'Y'}], correct: 'X' },
+      { id: 92, text: "Spell 'rhythm'", options: [{id:'rhythm',label:'r-h-y-t-h-m'},{id:'rythm',label:'r-y-t-h-m'},{id:'rhythem',label:'r-h-y-t-h-e-m'}], correct: 'rhythm' },
+      { id: 93, text: "How many consonants in 'uncopyrightable'?", options: [{id:'7',label:'7'},{id:'8',label:'8'},{id:'9',label:'9'}], correct: '8' },
+      { id: 94, text: "Which word has the most definitions in the dictionary?", options: [{id:'set',label:'set'},{id:'run',label:'run'},{id:'go',label:'go'}], correct: 'set' },
+      { id: 95, text: "Spell 'conscientious'", options: [{id:'conscientious',label:'c-o-n-s-c-i-e-n-t-i-o-u-s'},{id:'consciencious',label:'c-o-n-s-c-i-e-n-c-i-o-u-s'},{id:'conscientous',label:'c-o-n-s-c-i-e-n-t-o-u-s'}], correct: 'conscientious' },
+      { id: 96, text: "What is the 20th letter?", options: [{id:'T',label:'T'},{id:'U',label:'U'},{id:'V',label:'V'}], correct: 'T' },
+      { id: 97, text: "Which word is an antonym of 'increase'?", options: [{id:'decrease',label:'decrease'},{id:'grow',label:'grow'},{id:'expand',label:'expand'}], correct: 'decrease' },
+      { id: 98, text: "Spell 'mnemonic'", options: [{id:'mnemonic',label:'m-n-e-m-o-n-i-c'},{id:'nemonic',label:'n-e-m-o-n-i-c'},{id:'memonick',label:'m-e-m-o-n-i-c-k'}], correct: 'mnemonic' },
+      { id: 99, text: "How many letters in 'floccinaucinihilipilification'?", options: [{id:'29',label:'29'},{id:'30',label:'30'},{id:'31',label:'31'}], correct: '29' },
+      { id: 100, text: "What is the last letter of 'pneumonoultramicroscopicsilicovolcanoconiosis'?", options: [{id:'S',label:'S'},{id:'I',label:'I'},{id:'N',label:'N'}], correct: 'S' },
     ]
   },
   {
     name: "Level 6",
     questions: [
-      { id: 101, text: "What comes next? 2, 3, 5, 9, 17, ?", options: [{id:'A',label:'31'},{id:'B',label:'33'},{id:'C',label:'35'},{id:'D',label:'37'}], correct: 'B' },
-      { id: 102, text: "Which word is the odd one out? circle, square, triangle, sphere", options: [{id:'A',label:'circle'},{id:'B',label:'square'},{id:'C',label:'triangle'},{id:'D',label:'sphere'}], correct: 'D' },
-      { id: 103, text: "If a clock shows 3:15, what is the angle between hour and minute hands?", options: [{id:'A',label:'0°'},{id:'B',label:'7.5°'},{id:'C',label:'15°'},{id:'D',label:'30°'}], correct: 'B' },
-      { id: 104, text: "Which number is a perfect cube?", options: [{id:'A',label:'16'},{id:'B',label:'25'},{id:'C',label:'27'},{id:'D',label:'36'}], correct: 'C' },
-      { id: 105, text: "Complete the analogy: Tree is to forest as star is to ?", options: [{id:'A',label:'sky'},{id:'B',label:'galaxy'},{id:'C',label:'universe'},{id:'D',label:'sun'}], correct: 'B' },
-      { id: 106, text: "What is the square root of 144?", options: [{id:'A',label:'10'},{id:'B',label:'12'},{id:'C',label:'14'},{id:'D',label:'16'}], correct: 'B' },
-      { id: 107, text: "Which one is a type of rock?", options: [{id:'A',label:'igneous'},{id:'B',label:'magma'},{id:'C',label:'lava'},{id:'D',label:'volcano'}], correct: 'A' },
-      { id: 108, text: "How many faces does a cube have?", options: [{id:'A',label:'4'},{id:'B',label:'6'},{id:'C',label:'8'},{id:'D',label:'12'}], correct: 'B' },
-      { id: 109, text: "Which word means the same as 'enormous'?", options: [{id:'A',label:'tiny'},{id:'B',label:'huge'},{id:'C',label:'medium'},{id:'D',label:'small'}], correct: 'B' },
-      { id: 110, text: "What is 15% of 200?", options: [{id:'A',label:'15'},{id:'B',label:'30'},{id:'C',label:'35'},{id:'D',label:'40'}], correct: 'B' },
-      { id: 111, text: "Which one is a programming paradigm?", options: [{id:'A',label:'object-oriented'},{id:'B',label:'linear'},{id:'C',label:'circular'},{id:'D',label:'triangular'}], correct: 'A' },
-      { id: 112, text: "How many continents are there?", options: [{id:'A',label:'5'},{id:'B',label:'6'},{id:'C',label:'7'},{id:'D',label:'8'}], correct: 'C' },
-      { id: 113, text: "Which one is a type of cloud?", options: [{id:'A',label:'cumulus'},{id:'B',label:'stratus'},{id:'C',label:'both'},{id:'D',label:'neither'}], correct: 'A' },
-      { id: 114, text: "What is the next number? 1, 1, 2, 3, 5, 8, ?", options: [{id:'A',label:'11'},{id:'B',label:'12'},{id:'C',label:'13'},{id:'D',label:'14'}], correct: 'C' },
-      { id: 115, text: "Which word is a palindrome?", options: [{id:'A',label:'racecar'},{id:'B',label:'banana'},{id:'C',label:'apple'},{id:'D',label:'orange'}], correct: 'A' },
-      { id: 116, text: "What is the chemical symbol for gold?", options: [{id:'A',label:'Go'},{id:'B',label:'Gd'},{id:'C',label:'Au'},{id:'D',label:'Ag'}], correct: 'C' },
-      { id: 117, text: "How many edges does a cube have?", options: [{id:'A',label:'6'},{id:'B',label:'8'},{id:'C',label:'12'},{id:'D',label:'16'}], correct: 'C' },
-      { id: 118, text: "Which one is a type of energy?", options: [{id:'A',label:'kinetic'},{id:'B',label:'potential'},{id:'C',label:'both'},{id:'D',label:'neither'}], correct: 'A' },
-      { id: 119, text: "If you have 3 apples and you take away 2, how many do you have?", options: [{id:'A',label:'1'},{id:'B',label:'2'},{id:'C',label:'3'},{id:'D',label:'5'}], correct: 'B' },
-      { id: 120, text: "What is the Roman numeral for 50?", options: [{id:'A',label:'C'},{id:'B',label:'L'},{id:'C',label:'X'},{id:'D',label:'V'}], correct: 'B' },
+      { id: 101, text: "Which word is spelled correctly?", options: [{id:'unnecessary',label:'unnecessary'},{id:'unneccessary',label:'unneccessary'},{id:'unnecesary',label:'unnecesary'}], correct: 'unnecessary' },
+      { id: 102, text: "What is the only word in English that ends with 'mt'?", options: [{id:'dreamt',label:'dreamt'},{id:'tempt',label:'tempt'},{id:'attempt',label:'attempt'}], correct: 'dreamt' },
+      { id: 103, text: "How many vowels in 'strengths'?", options: [{id:'1',label:'1'},{id:'0',label:'0'},{id:'2',label:'2'}], correct: '1' },
+      { id: 104, text: "Spell 'synecdoche'", options: [{id:'synecdoche',label:'s-y-n-e-c-d-o-c-h-e'},{id:'synechdoche',label:'s-y-n-e-c-h-d-o-c-h-e'},{id:'synedoche',label:'s-y-n-e-d-o-c-h-e'}], correct: 'synecdoche' },
+      { id: 105, text: "Which word has all five vowels in order?", options: [{id:'abstemious',label:'abstemious'},{id:'facetious',label:'facetious'},{id:'sacrilegious',label:'sacrilegious'}], correct: 'facetious' },
+      { id: 106, text: "What is the longest one-syllable word?", options: [{id:'screeched',label:'screeched'},{id:'strengths',label:'strengths'},{id:'through',label:'through'}], correct: 'screeched' },
+      { id: 107, text: "Spell 'chiaroscurist'", options: [{id:'chiaroscurist',label:'c-h-i-a-r-o-s-c-u-r-i-s-t'},{id:'chiaroscourist',label:'c-h-i-a-r-o-s-c-o-u-r-i-s-t'},{id:'chiaroscrist',label:'c-h-i-a-r-o-s-c-r-i-s-t'}], correct: 'chiaroscurist' },
+      { id: 108, text: "How many letters in 'hippopotomonstrosesquippedaliophobia'?", options: [{id:'36',label:'36'},{id:'37',label:'37'},{id:'38',label:'38'}], correct: '36' },
+      { id: 109, text: "Which word is a heterogram (no letter repeated)?", options: [{id:'uncopyrightable',label:'uncopyrightable'},{id:'subdermatoglyphic',label:'subdermatoglyphic'},{id:'both',label:'both'}], correct: 'both' },
+      { id: 110, text: "What is the only common word with three double letters in a row?", options: [{id:'bookkeeper',label:'bookkeeper'},{id:'committee',label:'committee'},{id:'success',label:'success'}], correct: 'bookkeeper' },
+      { id: 111, text: "Spell 'otorhinolaryngologist'", options: [{id:'otorhinolaryngologist',label:'o-t-o-r-h-i-n-o-l-a-r-y-n-g-o-l-o-g-i-s-t'},{id:'otorinolaryngologist',label:'o-t-o-r-i-n-o-l-a-r-y-n-g-o-l-o-g-i-s-t'},{id:'otorhinolaryngoligist',label:'o-t-o-r-h-i-n-o-l-a-r-y-n-g-o-l-i-g-i-s-t'}], correct: 'otorhinolaryngologist' },
+      { id: 112, text: "What is the 23rd letter?", options: [{id:'W',label:'W'},{id:'X',label:'X'},{id:'Y',label:'Y'}], correct: 'W' },
+      { id: 113, text: "Which word is a palindrome?", options: [{id:'tattarrattat',label:'tattarrattat'},{id:'racecar',label:'racecar'},{id:'both',label:'both'}], correct: 'both' },
+      { id: 114, text: "Spell 'philosophical'", options: [{id:'philosophical',label:'p-h-i-l-o-s-o-p-h-i-c-a-l'},{id:'philosophical',label:'p-h-i-l-o-s-o-p-h-i-c-a-l'},{id:'philosophical',label:'p-h-i-l-o-s-o-p-h-i-c-a-l'}], correct: 'philosophical' },
+      { id: 115, text: "How many consonants in 'psychophysiology'?", options: [{id:'9',label:'9'},{id:'10',label:'10'},{id:'11',label:'11'}], correct: '10' },
+      { id: 116, text: "Which word is a synonym for 'deceive'?", options: [{id:'bamboozle',label:'bamboozle'},{id:'clarify',label:'clarify'},{id:'explain',label:'explain'}], correct: 'bamboozle' },
+      { id: 117, text: "What is the first letter of 'pseudopseudohypoparathyroidism'?", options: [{id:'P',label:'P'},{id:'S',label:'S'},{id:'H',label:'H'}], correct: 'P' },
+      { id: 118, text: "Spell 'supercalifragilisticexpialidocious'", options: [{id:'supercalifragilisticexpialidocious',label:'s-u-p-e-r-c-a-l-i-f-r-a-g-i-l-i-s-t-i-c-e-x-p-i-a-l-i-d-o-c-i-o-u-s'},{id:'supercalifragilisticexpiallidocious',label:'s-u-p-e-r-c-a-l-i-f-r-a-g-i-l-i-s-t-i-c-e-x-p-i-a-l-l-i-d-o-c-i-o-u-s'},{id:'supercalifragilisticexpialidocius',label:'s-u-p-e-r-c-a-l-i-f-r-a-g-i-l-i-s-t-i-c-e-x-p-i-a-l-i-d-o-c-i-u-s'}], correct: 'supercalifragilisticexpialidocious' },
+      { id: 119, text: "How many letters in the longest English word (technical)?", options: [{id:'189819',label:'189,819'},{id:'1899',label:'1,899'},{id:'18981',label:'18,981'}], correct: '189819' },
+      { id: 120, text: "What is the last letter of the alphabet backwards?", options: [{id:'A',label:'A'},{id:'Z',label:'Z'},{id:'B',label:'B'}], correct: 'A' },
     ]
   }
 ];
@@ -263,7 +247,7 @@ const HapticManager = {
 };
 
 // ==================== MAIN GAME COMPONENT ====================
-export default function PuzzlePeakScreen() {
+export default function ABCScreen() {
   const navigation = useNavigation();
   const { width, height } = useWindowDimensions();
   
@@ -323,11 +307,8 @@ export default function PuzzlePeakScreen() {
     return a;
   };
 
-  // Generate a new extra option (for wrong attempts) - only works for number options, but we have none.
-  // We'll keep a simplified version that adds a dummy option if possible, but since all options are text,
-  // we'll just shuffle. For simplicity, we'll not add extra options for text-based questions.
+  // For text options, we only shuffle after a wrong attempt, no extra option added.
   const updateOptionsAfterWrong = () => {
-    // Just shuffle current options
     setCurrentOptions(shuffleArray(currentOptions));
   };
 
@@ -371,7 +352,7 @@ export default function PuzzlePeakScreen() {
 
   const loadHighScore = async () => {
     try {
-      const saved = await AsyncStorage.getItem('puzzlePeak_highScore');
+      const saved = await AsyncStorage.getItem('abc_highScore');
       if (saved) setHighScore(parseInt(saved));
     } catch (e) {}
   };
@@ -379,7 +360,7 @@ export default function PuzzlePeakScreen() {
   const saveHighScore = async (newScore) => {
     if (newScore > highScore) {
       setHighScore(newScore);
-      await AsyncStorage.setItem('puzzlePeak_highScore', newScore.toString());
+      await AsyncStorage.setItem('abc_highScore', newScore.toString());
     }
   };
 
@@ -593,9 +574,9 @@ export default function PuzzlePeakScreen() {
       <SafeAreaView style={[styles.container, styles.centerContent]}>
         <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
         <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-          <Text style={[styles.loadingEmoji, { fontSize: fontSize.xlarge * 2 }]}>🧩🤔💡</Text>
+          <Text style={[styles.loadingEmoji, { fontSize: fontSize.xlarge * 2 }]}>🔤📚</Text>
         </Animated.View>
-        <Text style={[styles.loadingText, { fontSize: fontSize.large }]}>Loading Puzzle Peak...</Text>
+        <Text style={[styles.loadingText, { fontSize: fontSize.large }]}>Loading ABC Game...</Text>
         <View style={styles.progressBar}>
           <Animated.View style={[styles.progressFill, { width: "100%" }]} />
         </View>
@@ -607,7 +588,7 @@ export default function PuzzlePeakScreen() {
     return (
       <SafeAreaView style={[styles.container, styles.centerContent]}>
         <StatusBar barStyle="dark-content" backgroundColor={COLORS.background} />
-        <Text style={[styles.welcomeTitle, { fontSize: fontSize.xlarge }]}>🧩 Puzzle Peak</Text>
+        <Text style={[styles.welcomeTitle, { fontSize: fontSize.xlarge }]}>🔤 ABC Game</Text>
         <Text style={[styles.welcomeSubtitle, { fontSize: fontSize.medium }]}>Choose a level!</Text>
         
         <ScrollView contentContainerStyle={styles.levelContainer} showsVerticalScrollIndicator={false}>
@@ -730,7 +711,6 @@ export default function PuzzlePeakScreen() {
 
   const renderOptions = () => {
     return currentOptions.map((opt, idx) => {
-      // All options are text objects
       const optionId = opt.id;
       const isSelected = selectedOptionId === optionId;
 
@@ -1055,16 +1035,6 @@ const styles = StyleSheet.create({
   optionDisabled: {
     opacity: 0.5,
   },
-  shapeCircle: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 3,
-    shadowColor: COLORS.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-  },
-  shapeEmoji: {},
   textOption: {
     borderRadius: 25,
     paddingHorizontal: 18,
