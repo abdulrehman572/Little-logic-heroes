@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  Linking, // ✅ added
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { COLORS, SIZES } from "../constants/theme";
@@ -81,28 +82,31 @@ const modules = [
   },
 ];
 
+// YouTube video URL (you can change this per line if needed)
+const YOUTUBE_VIDEO_URL = "https://www.youtube.com/watch?v=CdSF2LmxdV8";
+
 export default function HomeScreen() {
   const navigation = useNavigation();
 
-  // Handlers for hyperlink instructions
-  const handleGamePress = () => {
-    Alert.alert("Tip", "How to Play");
+  // Open the YouTube link
+  const openVideoLink = async () => {
+    try {
+      const supported = await Linking.canOpenURL(YOUTUBE_VIDEO_URL);
+      if (supported) {
+        await Linking.openURL(YOUTUBE_VIDEO_URL);
+      } else {
+        Alert.alert("Error", "Cannot open the video link.");
+      }
+    } catch (error) {
+      Alert.alert("Error", "An error occurred while opening the link.");
+    }
   };
-  const handleSkillPress = () => {
-    Alert.alert(
-      "Skills",
-      "Each game teaches shape recognition, counting, patterns, logic, memory, and puzzles."
-    );
-  };
-  const handleBackInfo = () => {
-    Alert.alert(
-      "Navigation",
-      "Use the back button at the top left to return to this home screen."
-    );
-  };
-  const handleFunPress = () => {
-    Alert.alert("Enjoy!", "Have fun learning with NGES!");
-  };
+
+  // Each handler calls the same video opener
+  const handleGamePress = openVideoLink;
+  const handleSkillPress = openVideoLink;
+  const handleBackInfo = openVideoLink;
+  const handleFunPress = openVideoLink;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -113,7 +117,7 @@ export default function HomeScreen() {
         {/* Header with Logo */}
         <View style={styles.header}>
           <Image
-            source={require("../../assets/images/logo.jpeg")}
+            source={require("../../assets/images/logo.png")}
             style={styles.logo}
             resizeMode="contain"
           />
