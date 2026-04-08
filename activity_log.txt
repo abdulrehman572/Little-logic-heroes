@@ -281,3 +281,4 @@
 2026-03-31 - Improve one learning activity (auto)
 2026-04-04 - Add an accessibility or usability improvement (auto)
 2026-04-07 - Improve one learning activity (auto)
+2026-04-08 - Fix one UI issue (auto)
