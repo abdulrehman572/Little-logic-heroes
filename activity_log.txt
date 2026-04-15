@@ -286,3 +286,4 @@
 2026-04-10 - Improve local progress handling (auto)
 2026-04-13 - Improve documentation (auto)
 2026-04-14 - Improve one learning activity (auto)
+2026-04-15 - Fix one UI issue (auto)
