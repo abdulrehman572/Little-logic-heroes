@@ -311,3 +311,4 @@
 2026-05-19 - Improve one learning activity (auto)
 2026-05-20 - Fix one UI issue (auto)
 2026-05-21 - Improve animation or interaction (auto)
+2026-05-22 - Improve local progress handling (auto)
