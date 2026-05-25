@@ -313,3 +313,4 @@
 2026-05-21 - Improve animation or interaction (auto)
 2026-05-22 - Improve local progress handling (auto)
 2026-05-23 - Add an accessibility or usability improvement (auto)
+2026-05-25 - Improve documentation (auto)
