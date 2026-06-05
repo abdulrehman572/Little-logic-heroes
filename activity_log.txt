@@ -319,3 +319,4 @@
 2026-06-01 - Improve documentation (auto)
 2026-06-03 - Fix one UI issue (auto)
 2026-06-04 - Improve animation or interaction (auto)
+2026-06-05 - Improve local progress handling (auto)
