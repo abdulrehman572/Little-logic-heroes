@@ -347,3 +347,4 @@
 2026-07-14 - Improve one learning activity (auto)
 2026-07-15 - Fix one UI issue (auto)
 2026-07-16 - Improve animation or interaction (auto)
+2026-07-17 - Improve local progress handling (auto)
