@@ -358,3 +358,4 @@
 2026-07-31 - Improve local progress handling (auto)
 2026-08-03 - Improve documentation (auto)
 2026-08-04 - Improve one learning activity (auto)
+2026-08-05 - Fix one UI issue (auto)
