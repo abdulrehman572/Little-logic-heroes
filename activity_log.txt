@@ -369,3 +369,4 @@
 2026-08-15 - Add an accessibility or usability improvement (auto)
 2026-08-18 - Improve one learning activity (auto)
 2026-08-20 - Improve animation or interaction (auto)
+2026-08-21 - Improve local progress handling (auto)
